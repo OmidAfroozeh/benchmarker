@@ -19,6 +19,14 @@ You can also directly run the project with poetry:
 poetry run python experiments/tpcds_nightly_experiment.py
 ```
 
+## Unified String Dictionary Experiments
+To run USD experiments:
+```bash
+ chmod +x ./run_experiments.bash
+ ./run_experiment.bash
+```
+It will generate the synthetic datasets and run the queries. The result can be seen in the ``_output/results`` paths.
+
 ## Experiment Configuration
 
 You can create an experiment by adding a new python_script in the `experiments` directory. For an easy start,

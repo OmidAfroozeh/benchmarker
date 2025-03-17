@@ -23,7 +23,9 @@ def run_evaluation():
                 experiment.system.version as system_version,
                 {{'name': system_name, 'version': system_version}} as system,
                 experiment.system_setting as system_setting,
-                list_min(runtimes) as min_runtime
+                list_min(runtimes) as min_runtime,
+                list_median(runtimes[2:]) AS avg_runtime,
+                list_median(runtimes) as median_runtime
             FROM '{runs_path}/*/*/*.json'
         );"""
     con.execute(view_query)
@@ -89,7 +91,7 @@ def eval_system_tuple_group(system_tuple: tuple[dict[str, str], dict[str, str]],
     query = f"""
         SELECT 
             CAST({group_string} AS STRING) as {group_string}_str, 
-            AVG(min_runtime) as avg_runtime
+            AVG(median_runtime) as avg_runtime
         {from_query}
         AND system = '{str(system_tuple[0]).replace("'", "''")}'
         GROUP BY {group_string}
@@ -100,7 +102,7 @@ def eval_system_tuple_group(system_tuple: tuple[dict[str, str], dict[str, str]],
     query = f"""
         SELECT
             CAST({group_string} AS STRING) as {group_string}_str, 
-            AVG(min_runtime) as avg_runtime
+            AVG(median_runtime) as avg_runtime
         {from_query}
         AND system = '{str(system_tuple[1]).replace("'", "''")}'
         GROUP BY {group_string}
@@ -175,6 +177,9 @@ def evaluate_run_date(run_name: str, run_date: str, con: duckdb.DuckDBPyConnecti
         os.makedirs(plots_path)
     df.to_csv(os.path.join(path, 'run.csv'), index=False)
 
+    plot_query_vs_dataconfig_system(con, from_query, plots_path)
+
+
     system_plot_grouped = plot_aggregation('system', con, from_query, plots_path, per_query=True)
     system_plot_grouped_data_config = plot_aggregation('system', con, from_query, plots_path, per_query=True,
                                                        subplot_group='data_config')
@@ -191,30 +196,30 @@ def evaluate_run_date(run_name: str, run_date: str, con: duckdb.DuckDBPyConnecti
     s2s_text = system_to_system_evaluation(con, from_query)
 
 
+#
+#     # create little markdown file with embedded plots, we can create md images as ![name](path)
+#     md = f"""
+# # {run_name} - {run_date}
+# """
+#     md += s2s_text
+#
+#     md += query_index_to_name_table(con, from_query)
+#
+#     plots_md = f"""
+# ## Performance per System and Data Configuration
+# ![System](plots/{os.path.basename(system_plot_grouped_data_config)})
+# ## Performance per System and System Configuration
+# ![System](plots/{os.path.basename(system_setting_plot_grouped_by_system)})
+# ## Performance per System Setting
+# ![System Setting](plots/{os.path.basename(system_setting_plot_grouped)})
+# ## Performance per Data Configuration
+# ![Data Configuration](plots/{os.path.basename(data_plot_grouped)})
+# """
+#     # add the plots to the markdown
+#     md += plots_md
 
-    # create little markdown file with embedded plots, we can create md images as ![name](path)
-    md = f"""
-# {run_name} - {run_date}
-"""
-    md += s2s_text
-
-    md += query_index_to_name_table(con, from_query)
-
-    plots_md = f"""
-## Performance per System and Data Configuration
-![System](plots/{os.path.basename(system_plot_grouped_data_config)})
-## Performance per System and System Configuration
-![System](plots/{os.path.basename(system_setting_plot_grouped_by_system)})
-## Performance per System Setting
-![System Setting](plots/{os.path.basename(system_setting_plot_grouped)})
-## Performance per Data Configuration
-![Data Configuration](plots/{os.path.basename(data_plot_grouped)})
-"""
-    # add the plots to the markdown
-    md += plots_md
-
-    with open(os.path.join(path, 'Summary.md'), 'w') as f:
-        f.write(md)
+    # with open(os.path.join(path, 'Summary.md'), 'w') as f:
+    #     f.write(md)
 
 
 import os
@@ -245,7 +250,7 @@ def plot_aggregation(group_column: str,
         SELECT 
             replace(CAST({group_column} AS STRING)[2:-2], '''', '') as group_column_string
             {', (query_index + 1) as query_index' if per_query else ''},
-            AVG(min_runtime) as avg_runtime
+            AVG(median_runtime) as avg_runtime
             {', replace(CAST(' + subplot_group + " AS STRING)[2:-2], '''', '') as " + subplot_group + '_str' if subplot_group else ''} 
         {from_query}
         GROUP BY {group_column} 
@@ -367,8 +372,8 @@ def create_plot(df_aggregated: pd.DataFrame,
         ax.set_xticks(x + width * (len(df_pivot.columns) - 1) / 2, df_pivot.index)
 
         ax.set_xlabel("Query Index")
-        ax.set_ylabel("Average Runtime")
-        ax.set_title(f'Average Runtime by Query Index grouped by {group_column}')
+        ax.set_ylabel("Median Runtime")
+        ax.set_title(f'Median Runtime by Query Index grouped by {group_column}')
         ax.legend(loc='upper left')
 
         # If we’re a standalone figure, save plot & data
@@ -398,8 +403,8 @@ def create_plot(df_aggregated: pd.DataFrame,
                     ha='center', va='bottom')
 
         ax.set_xlabel(group_column)
-        ax.set_ylabel('Average Runtime')
-        ax.set_title(f'Average Runtime by {group_column}')
+        ax.set_ylabel('Median Runtime')
+        ax.set_title(f'Median Runtime by {group_column}')
 
         if is_standalone:
             plot_path = os.path.join(path, f'{group_column}{name_extension}.png')
@@ -412,6 +417,82 @@ def create_plot(df_aggregated: pd.DataFrame,
             if subplot_title:
                 ax.set_title(subplot_title)
             return ""
+
+def plot_query_vs_dataconfig_system(con: duckdb.DuckDBPyConnection,
+                                         from_query: str,
+                                         path: str) -> None:
+    """
+    For each query_index, create a grouped-bar chart:
+
+        x-axis   → every data_config value
+        bars     → one *per distinct system variant*
+                   (system_name + system_version + system_setting)
+        height   → AVG(avg_runtime)
+
+    One PNG (and matching CSV) is written into <path>.
+    """
+    sql = f"""
+        SELECT
+            query_index,
+            replace(CAST(data_config AS STRING)[2:-2], '''', '')   AS data_config_str,
+            system_name,
+            system_version,
+            replace(CAST(system_setting AS STRING)[2:-2], '''', '') AS system_setting_str,
+            AVG(median_runtime)                                         AS avg_runtime
+        {from_query}
+        GROUP BY query_index, data_config, system_name,
+                 system_version, system_setting
+        ORDER BY query_index, data_config_str,
+                 system_name, system_version, system_setting_str;
+    """
+    df = con.execute(sql).fetchdf()
+    if df.empty:
+        return
+
+    # build a readable label for *every* concrete system variant
+    df["system_label"] = (
+        df["system_name"]
+        + " (" + df["system_version"] + ")"
+        + df["system_setting_str"].apply(
+              lambda s: f" | {s}" if s not in (None, "", "NULL") else ""
+          )
+    )
+
+    for q in sorted(df["query_index"].unique()):
+        sub = df[df["query_index"] == q]
+
+        # pivot → rows = data_config, cols = *each* system variant
+        pivot = sub.pivot(index="data_config_str",
+                          columns="system_label",
+                          values="avg_runtime").reindex(
+                              columns=sub["system_label"].unique())
+
+        x = np.arange(len(pivot.index))
+        width = 0.8 / max(len(pivot.columns), 1)
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+
+        for idx, col in enumerate(pivot.columns):
+            offset = idx * width
+            rects = ax.bar(x + offset, pivot[col], width, label=col)
+            ax.bar_label(rects, padding=3, fmt="%.2f")
+
+        ax.set_xticks(
+            x + width * (len(pivot.columns) - 1) / 2,
+            pivot.index,
+            rotation=20,
+            ha="right"
+        )
+        ax.set_xlabel("Data Configuration")
+        ax.set_ylabel("Median Runtime (s)")
+        ax.set_title(f"Query {q} – median runtime per data-config & system variant")
+        ax.legend(loc="upper left", fontsize="small", ncol=2)
+        plt.tight_layout()
+
+        png = os.path.join(path, f"query_{q}_data_config_all_systems.png")
+        pivot.to_csv(png.replace(".png", ".csv"))
+        plt.savefig(png, dpi=300, bbox_inches="tight")
+        plt.close(fig)
 
 
 if __name__ == "__main__":

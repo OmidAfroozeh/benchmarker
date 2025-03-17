@@ -134,7 +134,8 @@ def run_command_with_timeout(command: str, timeout: float, env_vars: dict = None
     logger.info(f'Running command: {command} with timeout {timeout}')
     logger.info(f'For running the command we have the following environment variables: {env_vars}')
 
-    verbose = logger.getEffectiveLevel() <= logging.INFO
+    # verbose = logger.getEffectiveLevel() <= logging.INFO
+    verbose = None
     if not verbose:
         command += ' > /dev/null 2>&1'
     if verbose:
