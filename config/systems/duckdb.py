@@ -66,7 +66,7 @@ DUCK_DB_MAIN: System = {
         'build_command': 'GEN=ninja BUILD_HTTPFS=1 BUILD_TPCH=1 BUILD_TPCDS=1 make',
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/duckdb/duckdb/commit/1f98600c2cf8722a6d2f2d805bb4af5e701319fc',
+            'github_url': 'https://github.com/duckdb/duckdb',
         },
     },
     'run_config': {
@@ -243,6 +243,19 @@ DUCK_DB_PARTITIONED: System = {
         'location': {
             'location': 'github',
             'github_url': 'https://github.com/gropaul/duckdb/tree/join/partioning-non-atomic-v2'
+        },
+    },
+}
+
+DUCK_DB_USSR: System = {
+    **DUCK_DB_MAIN,
+    'version': 'USSR_Basic_implementation',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/97edbc987858bbefbd56965d6281d75b60acf56b'
         },
     },
 }
