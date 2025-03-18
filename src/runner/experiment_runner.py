@@ -121,12 +121,11 @@ def run_experiment(experiment: Experiment, thread_index: int):
     for i in range(n_runs):
 
         status: Status = run_script(system, script, timeout, thread_index, env_vars)
-
         if status != 'success':
             logger.error(f"Error in running {system['name']}-{system['version']}")
             # log the run script
             logger.error(script)
-            sleep(0.2)  # wait for process to finish to release db locks
+            sleep(0.5)  # wait for process to finish to release db locks
             if status == 'crash' or status == 'timeout':  # if timeout or crash, break
                 break
 

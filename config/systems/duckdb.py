@@ -63,7 +63,7 @@ DUCK_DB_MAIN: System = {
     'version': 'v1.0.0',
     'name': 'duckdb',
     'build_config': {
-        'build_command': 'GEN=ninja BUILD_HTTPFS=1 BUILD_TPCH=1 BUILD_TPCDS=1 make',
+        'build_command': 'GEN=ninja BUILD_HTTPFS=1 BUILD_TPCH=1 BUILD_PARQUET=1 BUILD_TPCDS=1 make',
         'location': {
             'location': 'github',
             'github_url': 'https://github.com/duckdb/duckdb',
