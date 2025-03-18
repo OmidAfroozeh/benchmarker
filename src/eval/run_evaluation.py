@@ -23,7 +23,8 @@ def run_evaluation():
                 experiment.system.version as system_version,
                 {{'name': system_name, 'version': system_version}} as system,
                 experiment.system_setting as system_setting,
-                list_min(runtimes) as min_runtime
+                list_min(runtimes) as min_runtime,
+                list_avg(runtimes) as avg_runtime
             FROM '{runs_path}/*/*/*.json'
         );"""
     con.execute(view_query)
