@@ -15,7 +15,7 @@ def main():
     config: RunConfig = {
         'name': 'USSR_vs_baseline_tpch',
         'run_settings': {
-            'n_parallel': 1,
+            'n_parallel': 4,
             'n_runs': 5,
         },
         'system_settings': [
