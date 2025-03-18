@@ -61,14 +61,14 @@ def evaluate_run_date(run_name: str, run_date: str, con: duckdb.DuckDBPyConnecti
         os.makedirs(plots_path)
     df.to_csv(os.path.join(path, 'run.csv'), index=False)
 
-    system_plot_grouped = plot_aggregation('system', con, from_query, plots_path, per_query=True)
-    system_plot = plot_aggregation('system', con, from_query, plots_path)
-
-
-    system_setting_plot_grouped = plot_aggregation('system_setting', con, from_query, plots_path, per_query=True)
-    system_setting_plot = plot_aggregation('system_name', con, from_query, plots_path)
-    data_plot_grouped = plot_aggregation('data_config', con, from_query, plots_path, per_query=True)
-    data_plot = plot_aggregation('query', con, from_query, plots_path)
+    # system_plot_grouped = plot_aggregation('system', con, from_query, plots_path, per_query=True)
+    # system_plot = plot_aggregation('system', con, from_query, plots_path)
+    #
+    #
+    # system_setting_plot_grouped = plot_aggregation('system_setting', con, from_query, plots_path, per_query=True)
+    # system_setting_plot = plot_aggregation('system_name', con, from_query, plots_path)
+    # data_plot_grouped = plot_aggregation('data_config', con, from_query, plots_path, per_query=True)
+    # data_plot = plot_aggregation('query', con, from_query, plots_path)
 
 
 
