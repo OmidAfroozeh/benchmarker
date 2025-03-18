@@ -24,7 +24,7 @@ def main():
             # {'n_threads': 4},
             # {'n_threads': 8},
         ],
-        'systems': [DUCK_DB_FIRST_TEST, DUCK_DB_MAIN],
+        'systems': [DUCK_DB_USSR, DUCK_DB_MAIN],
         'benchmarks': get_tpcds_benchmark(sfs),
     }
     run(config)
