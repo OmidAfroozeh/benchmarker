@@ -74,19 +74,19 @@ def evaluate_run_date(run_name: str, run_date: str, con: duckdb.DuckDBPyConnecti
 
 
 
-    # create little markdown file with embedded plots, we can create md images as ![name](path)
-    md = f"""
-# {run_name} - {run_date}
-## Performance per System
-![System](plots/{os.path.basename(system_plot_grouped)})
-## Performance per System Setting
-![System Setting](plots/{os.path.basename(system_setting_plot_grouped)})
-## Performance per Data Configuration
-![Data Configuration](plots/{os.path.basename(data_plot_grouped)})
-
-    """
-    with open(os.path.join(path, 'Summary.md'), 'w') as f:
-        f.write(md)
+#     # create little markdown file with embedded plots, we can create md images as ![name](path)
+#     md = f"""
+# # {run_name} - {run_date}
+# ## Performance per System
+# ![System](plots/{os.path.basename(system_plot_grouped)})
+# ## Performance per System Setting
+# ![System Setting](plots/{os.path.basename(system_setting_plot_grouped)})
+# ## Performance per Data Configuration
+# ![Data Configuration](plots/{os.path.basename(data_plot_grouped)})
+#
+#     """
+#     with open(os.path.join(path, 'Summary.md'), 'w') as f:
+#         f.write(md)
 
 
 def plot_aggregation(group_column: str, con: duckdb.DuckDBPyConnection, from_query: str, path: str, per_query=False):
