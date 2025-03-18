@@ -11,11 +11,11 @@ from src.runner.experiment_runner import run
 
 
 def main():
-    sfs = [1]
+    sfs = [10, 30, 100]
     config: RunConfig = {
         'name': 'USSR_vs_baseline_tpch',
         'run_settings': {
-            'n_parallel': 4,
+            'n_parallel': 8,
             'n_runs': 5,
         },
         'system_settings': [
