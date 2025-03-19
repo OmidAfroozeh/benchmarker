@@ -11,7 +11,7 @@ from src.runner.experiment_runner import run
 
 
 def main():
-    sfs = [10, 30, 100]
+    sfs = [300]
     config: RunConfig = {
         'name': 'USSR_vs_baseline_tpch',
         'run_settings': {
