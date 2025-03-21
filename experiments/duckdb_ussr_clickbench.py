@@ -14,16 +14,16 @@ def main():
     config: RunConfig = {
         'name': 'USSR_vs_baseline_clickbench',
         'run_settings': {
-            'n_parallel': 1,
+            'n_parallel': 5,
             'n_runs': 5,
         },
         'system_settings': [
-            {'n_threads': 6},
-            # {'n_threads': 2},
+            # {'n_threads': 6},
+            {'n_threads': 1},
             # {'n_threads': 4},
             # {'n_threads': 8},
         ],
-        'systems': [DUCK_DB_MAIN],
+        'systems': [DUCK_DB_MAIN, DUCK_DB_USSR],
         'benchmarks': get_clickbench(),
     }
     run(config)

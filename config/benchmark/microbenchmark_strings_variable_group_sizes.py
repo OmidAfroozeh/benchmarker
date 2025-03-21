@@ -11,14 +11,14 @@ logger = get_logger(__name__)
 
 MICRO_BENCHMARK_QUERY: List[Query] = [
     {
-        'name': 'double_column_groupby',
+        'name': 'single_column_groupby',
         'index': 0,
         'run_script': {
             "duckdb": "select str1 from varchars group by str1",
         }
     },
     {
-        'name': 'single_column_groupby',
+        'name': 'double_column_groupby',
         'index': 1,
         'run_script': {
             "duckdb": "select str1, str2 from varchars group by str1, str2",
@@ -60,7 +60,7 @@ def __generate_and_return_string_microbenchmark_data(str_lens: List[int]) -> Lis
             'name': f'tpcds-{sf}',
             'setup_script': setup_script,
             'config': {
-                'sf': sf
+                'group_size': sf
             }
         }
 
@@ -83,11 +83,12 @@ def __generate_string_microbenchmark_data(str_len: List[int]):
 
         logger.info(f'Started to generate data for string microbenchmark string size {sl} ...')
 
-
+        TOTAL_ROWS = 10_000_000
+        div = TOTAL_ROWS // sl
 
         con = duckdb.connect(duckdb_file_path)
         query_tpcds = f"""
-            CREATE TABLE varchars AS SELECT concat('thisisarandomstringjusttoseeblahblah', i//{sl}) AS str1, concat('thisisarandomstringjusttoseeblahblah', i//{sl}) AS str2 FROM range(10_000_000) tbl(i);
+            CREATE TABLE varchars AS SELECT concat('thisisarandomstringjusttoseeblahblah', i//{div}) AS str1, concat('thisisarandomstringjusttoseeblahblah', i//{div}) AS str2 FROM range(10_000_000) tbl(i);
         """
         con.sql(query_tpcds)
         con.close()

@@ -11,23 +11,24 @@ from src.runner.experiment_runner import run
 
 
 def main():
-    sfs = [300]
-    config: RunConfig = {
-        'name': 'USSR_vs_baseline_tpch',
-        'run_settings': {
-            'n_parallel': 8,
-            'n_runs': 5,
-        },
-        'system_settings': [
-            {'n_threads': 8},
-            # {'n_threads': 2},
-            # {'n_threads': 4},
-            # {'n_threads': 8},
-        ],
-        'systems': [DUCK_DB_USSR, DUCK_DB_MAIN],
-        'benchmarks': get_tpch_benchmark(sfs),
-    }
-    run(config)
+    sfs = [10, 30, 100]
+    for sf in sfs:
+        config: RunConfig = {
+            'name': f'USSR_vs_baseline_tpch_sf{sf}',
+            'run_settings': {
+                'n_parallel': 8,
+                'n_runs': 5,
+            },
+            'system_settings': [
+                {'n_threads': 8},
+                # {'n_threads': 2},
+                # {'n_threads': 4},
+                # {'n_threads': 8},
+            ],
+            'systems': [DUCK_DB_USSR, DUCK_DB_MAIN],
+            'benchmarks': get_tpch_benchmark([sf]),  # Pass as a single-element list
+        }
+        run(config)
 
 
 if __name__ == "__main__":
