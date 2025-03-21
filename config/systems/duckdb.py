@@ -60,7 +60,7 @@ def get_duckdb_runtime_and_cardinality(thread: int) -> Optional[Tuple[float, int
 
 
 DUCK_DB_MAIN: System = {
-    'version': 'v1.0.0',
+    'version': 'latest_build_main',
     'name': 'duckdb',
     'build_config': {
         'build_command': 'GEN=ninja BUILD_HTTPFS=1 BUILD_TPCH=1 BUILD_PARQUET=1 BUILD_TPCDS=1 make',
@@ -255,7 +255,7 @@ DUCK_DB_USSR: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/97edbc987858bbefbd56965d6281d75b60acf56b'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/ad1eaf9a8635a4d9297c5ad87396645387eb299b'
         },
     },
 }

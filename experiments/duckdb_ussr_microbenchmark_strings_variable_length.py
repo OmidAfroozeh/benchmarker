@@ -13,9 +13,9 @@ from src.runner.experiment_runner import run
 def main():
     sfs = [8, 16, 32, 64, 128, 256, 512]
     config: RunConfig = {
-        'name': 'USSR_vs_baseline_microbenchmark',
+        'name': 'USSR_vs_baseline_microbenchmark_variable_length',
         'run_settings': {
-            'n_parallel': 1,
+            'n_parallel': 5,
             'n_runs': 5,
         },
         'system_settings': [

@@ -11,14 +11,14 @@ logger = get_logger(__name__)
 
 MICRO_BENCHMARK_QUERY: List[Query] = [
     {
-        'name': 'double_column_groupby',
+        'name': 'single_column_groupby',
         'index': 0,
         'run_script': {
             "duckdb": "select str1 from varchars group by str1",
         }
     },
     {
-        'name': 'single_column_groupby',
+        'name': 'double_column_groupby',
         'index': 1,
         'run_script': {
             "duckdb": "select str1, str2 from varchars group by str1, str2",
@@ -60,7 +60,7 @@ def __generate_and_return_string_microbenchmark_data(str_lens: List[int]) -> Lis
             'name': f'tpcds-{sf}',
             'setup_script': setup_script,
             'config': {
-                'sf': sf
+                'string_length': sf
             }
         }
 
@@ -85,7 +85,7 @@ def __generate_string_microbenchmark_data(str_len: List[int]):
 
         # Generate temp_str of length sl
         base_str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        temp_str = (base_str * ((sl // len(base_str)) + 1))[:sl]
+        temp_str = (base_str * ((sl // len(base_str)) + 1))[:sl - 3]
 
         con = duckdb.connect(duckdb_file_path)
         query_tpcds = f"""

@@ -11,17 +11,17 @@ from src.runner.experiment_runner import run
 
 
 def main():
-    sfs = [100, 500, 1000, 2000, 5000, 10000, 20000]
+    sfs = [100, 500, 1000, 2000, 5000, 10000, 20000, 80000]
     config: RunConfig = {
-        'name': 'USSR_vs_baseline_microbenchmark',
+        'name': 'USSR_vs_baseline_microbenchmark_variable_grp_sizes',
         'run_settings': {
-            'n_parallel': 1,
+            'n_parallel': 5,
             'n_runs': 5,
         },
         'system_settings': [
-            {'n_threads': 1},
+            # {'n_threads': 1},
             # {'n_threads': 2},
-            # {'n_threads': 4},
+            {'n_threads': 4},
             # {'n_threads': 8},
         ],
         'systems': [DUCK_DB_USSR, DUCK_DB_MAIN],
