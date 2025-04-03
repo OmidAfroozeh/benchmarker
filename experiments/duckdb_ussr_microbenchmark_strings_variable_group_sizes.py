@@ -5,7 +5,7 @@ root_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pard
 sys.path.insert(0, root_directory)
 
 from config.benchmark.microbenchmark_strings_variable_group_sizes import get_string_len_benchmark
-from config.systems.duckdb import DUCK_DB_USSR, DUCK_DB_MAIN
+from config.systems.duckdb import DUCK_DB_USSR, DUCK_DB_MAIN, DUCK_DB_USSR_no_singleton
 from src.models import RunConfig
 from src.runner.experiment_runner import run
 
@@ -24,7 +24,7 @@ def main():
             {'n_threads': 4},
             # {'n_threads': 8},
         ],
-        'systems': [DUCK_DB_USSR, DUCK_DB_MAIN],
+        'systems': [DUCK_DB_USSR_no_singleton, DUCK_DB_USSR, DUCK_DB_MAIN],
         'benchmarks': get_string_len_benchmark(sfs),
     }
     run(config)

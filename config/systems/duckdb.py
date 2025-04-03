@@ -63,7 +63,7 @@ DUCK_DB_MAIN: System = {
     'version': 'latest_build_main',
     'name': 'duckdb',
     'build_config': {
-        'build_command': 'GEN=ninja BUILD_HTTPFS=1 BUILD_TPCH=1 BUILD_PARQUET=1 BUILD_TPCDS=1 make',
+        'build_command': 'GEN=ninja BUILD_BENCHMARK=1 BUILD_HTTPFS=1 BUILD_TPCH=1 BUILD_PARQUET=1 BUILD_TPCDS=1 make',
         'location': {
             'location': 'github',
             'github_url': 'https://github.com/duckdb/duckdb',
@@ -256,6 +256,71 @@ DUCK_DB_USSR: System = {
         'location': {
             'location': 'github',
             'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/ad1eaf9a8635a4d9297c5ad87396645387eb299b'
+        },
+    },
+}
+
+DUCK_DB_USSR_refactored: System = {
+    **DUCK_DB_MAIN,
+    'version': 'USSR_Basic_implementation_refactored',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/63abe1496d8c4f5bea975669b371cb6c8019b05e'
+        },
+    },
+}
+
+DUCK_DB_USSR_memcpy_optimization: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_memcpy_optimization',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/9e05da3147555e06ba4d77b60bfc87b1e9b649ba'
+        },
+    },
+}
+
+DUCK_DB_USSR_new_lock: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_new_lock',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/e81a7f50c4651279e417ada7e104f7b26378c99e'
+        },
+    },
+}
+
+DUCK_DB_USSR_predicate_materialize_once: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_predicate_materialize_once',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/d4e6c9bc332fb05cd01d8d0ea322453cc87e1ff3'
+        },
+    },
+}
+
+DUCK_DB_USSR_no_singleton: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_no_singleton',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/95919188bf29e57920a41f2ed602cb296672fa2f'
         },
     },
 }
