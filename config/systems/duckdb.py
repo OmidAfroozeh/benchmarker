@@ -323,4 +323,18 @@ DUCK_DB_USSR_no_singleton: System = {
             'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/95919188bf29e57920a41f2ed602cb296672fa2f'
         },
     },
+    
 }
+DUCK_DB_USSR_no_singleton_new_api: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_no_singleton_new_api',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/ac463c75efa39133b50169683f869ff23384e316'
+        },
+    },
+}
+
