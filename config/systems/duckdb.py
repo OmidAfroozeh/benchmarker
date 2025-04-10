@@ -320,7 +320,7 @@ DUCK_DB_USSR_no_singleton: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/95919188bf29e57920a41f2ed602cb296672fa2f'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/524c578ac1da5e4aebf422d2d66d67f911279320'
         },
     },
     
@@ -333,8 +333,33 @@ DUCK_DB_USSR_no_singleton_new_api: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/ac463c75efa39133b50169683f869ff23384e316'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/a0d71ba95e2bf39d9a7a776427c643ad7090df1b'
         },
     },
 }
 
+DUCK_DB_USSR_upper_limit: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_upper_limit',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/b7a404a2b06031eebbf236d1158c8dacbf659b11'
+        },
+    },
+}
+
+DUCK_DB_USSR_upper_limit_cheaper_hash: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_upper_limit_cheaper_hash',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/fab6b034f01d8e4734fd83ddbba3d34a580e079c'
+        },
+    },
+}
