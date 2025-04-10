@@ -15,7 +15,7 @@ def main():
     config: RunConfig = {
         'name': 'USSR_vs_baseline_microbenchmark_variable_length',
         'run_settings': {
-            'n_parallel': 5,
+            'n_parallel': 2,
             'n_runs': 15,
         },
         'system_settings': [
