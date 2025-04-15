@@ -363,3 +363,16 @@ DUCK_DB_USSR_upper_limit_cheaper_hash: System = {
         },
     },
 }
+
+DUCK_DB_USSR_stable_version: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_stable_version',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/6aa18b3f536c4134a52942a852412631c106d5ad'
+        },
+    },
+}
