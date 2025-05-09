@@ -20,7 +20,7 @@ def main():
                 'n_runs': 5,
             },
             'system_settings': [
-                {'n_threads': 6},
+                {'n_threads': 8},
                 # {'n_threads': 2},
                 # {'n_threads': 4},
                 # {'n_threads': 8},
