@@ -376,3 +376,67 @@ DUCK_DB_USSR_stable_version: System = {
         },
     },
 }
+DUCK_DB_USSR_stable_version_2x: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_stable_version_2x',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/db53180bc08af20df79f81b65a1d474cf6f4a55c'
+        },
+    },
+}
+
+DUCK_DB_USSR_stable_version_operator: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_stable_version_operator',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/412cfef1de7498ad21a13934bd61163d78550b2b'
+        },
+    },
+}
+
+DUCK_DB_USSR_stable_version_operator_bttr_strs_col_seg: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_stable_version_operator_bttr_strs_col_seg',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/88d92557fc57636c7db1fb20d8896791a1cac100'
+        },
+    },
+}
+
+DUCK_DB_USSR_stable_version_operator_bttr_strs_flattening: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_stable_version_operator_bttr_strs_flattening',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/0a5805dbe6115f4ccdf0fc1da287499b3aafc0b7'
+        },
+    },
+}
+
+DUCK_DB_USSR_stable_version_operator_bttr_strs_local: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCK_DB_USSR_stable_version_operator_bttr_strs_local',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/25ddc5bd7f5c32185c38cf3cef05778cadbb8771'
+        },
+    },
+}
