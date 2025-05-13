@@ -62,14 +62,14 @@ def evaluate_run_date(run_name: str, run_date: str, con: duckdb.DuckDBPyConnecti
         os.makedirs(plots_path)
     df.to_csv(os.path.join(path, 'run.csv'), index=False)
 
-    # system_plot_grouped = plot_aggregation('system', con, from_query, plots_path, per_query=True)
-    # system_plot = plot_aggregation('system', con, from_query, plots_path)
+    system_plot_grouped = plot_aggregation('system', con, from_query, plots_path, per_query=True)
+    system_plot = plot_aggregation('system', con, from_query, plots_path)
     
     
-    # system_setting_plot_grouped = plot_aggregation('system_setting', con, from_query, plots_path, per_query=True)
-    # system_setting_plot = plot_aggregation('system_name', con, from_query, plots_path)
-    # data_plot_grouped = plot_aggregation('data_config', con, from_query, plots_path, per_query=True)
-    # data_plot = plot_aggregation('query', con, from_query, plots_path)
+    system_setting_plot_grouped = plot_aggregation('system_setting', con, from_query, plots_path, per_query=True)
+    system_setting_plot = plot_aggregation('system_name', con, from_query, plots_path)
+    data_plot_grouped = plot_aggregation('data_config', con, from_query, plots_path, per_query=True)
+    data_plot = plot_aggregation('query', con, from_query, plots_path)
 
 
 
@@ -106,7 +106,7 @@ def plot_aggregation(group_column: str, con: duckdb.DuckDBPyConnection, from_que
         SELECT 
             replace(CAST({group_column} AS STRING)[2:-2], '''', '') as group_column_string
             {', (query_index + 1) as query_index' if per_query else ''},
-            AVG(min_runtime) as avg_runtime
+            AVG(avg_runtime) as avg_runtime
         {from_query}
         GROUP BY {group_column} {', query_index' if per_query else ''}
         ORDER BY {group_column} {', query_index' if per_query else ''};
