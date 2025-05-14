@@ -436,7 +436,7 @@ DUCK_DB_USSR_stable_version_operator_bttr_strs_local: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/78c2be213dfd266631fe4c73759d588e339a6b90'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/6c508c121f51dd2a1759359243efb51139114e09'
         },
     },
 }

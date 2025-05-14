@@ -15,7 +15,7 @@ def main():
         'name': 'USSR_vs_baseline_clickbench',
         'run_settings': {
             'n_parallel': 1,
-            'n_runs': 5,
+            'n_runs': 10,
         },
         'system_settings': [
             {'n_threads': 6},
@@ -23,7 +23,7 @@ def main():
             # {'n_threads': 4},
             # {'n_threads': 8},
         ],
-        'systems': [DUCK_DB_MAIN, DUCKDB_emit_DICT],
+        'systems': [DUCK_DB_MAIN, DUCK_DB_USSR_stable_version_operator_bttr_strs_local],
         'benchmarks': get_clickbench(),
     }
     run(config)

@@ -62,17 +62,14 @@ def evaluate_run_date(run_name: str, run_date: str, con: duckdb.DuckDBPyConnecti
         os.makedirs(plots_path)
     df.to_csv(os.path.join(path, 'run.csv'), index=False)
 
-    system_plot_grouped = plot_aggregation('system', con, from_query, plots_path, per_query=True)
-    system_plot = plot_aggregation('system', con, from_query, plots_path)
-    
-    
-    system_setting_plot_grouped = plot_aggregation('system_setting', con, from_query, plots_path, per_query=True)
-    system_setting_plot = plot_aggregation('system_name', con, from_query, plots_path)
-    data_plot_grouped = plot_aggregation('data_config', con, from_query, plots_path, per_query=True)
-    data_plot = plot_aggregation('query', con, from_query, plots_path)
-
-
-
+    # Uncomment these lines if/when needed
+    # system_plot_grouped = plot_aggregation('system', con, from_query, plots_path, per_query=True)
+    # system_plot = plot_aggregation('system', con, from_query, plots_path)
+    #
+    # system_setting_plot_grouped = plot_aggregation('system_setting', con, from_query, plots_path, per_query=True)
+    # system_setting_plot = plot_aggregation('system_name', con, from_query, plots_path)
+    # data_plot_grouped = plot_aggregation('data_config', con, from_query, plots_path, per_query=True)
+    # data_plot = plot_aggregation('query', con, from_query, plots_path)
 
 
 #     # create little markdown file with embedded plots, we can create md images as ![name](path)
@@ -84,7 +81,7 @@ def evaluate_run_date(run_name: str, run_date: str, con: duckdb.DuckDBPyConnecti
 # ![System Setting](plots/{os.path.basename(system_setting_plot_grouped)})
 # ## Performance per Data Configuration
 # ![Data Configuration](plots/{os.path.basename(data_plot_grouped)})
-
+#
 #     """
 #     with open(os.path.join(path, 'Summary.md'), 'w') as f:
 #         f.write(md)
@@ -97,7 +94,6 @@ def plot_aggregation(group_column: str, con: duckdb.DuckDBPyConnection, from_que
       - query_index * group_column if per_query=True (grouped bar plot)
     """
     # Step 4: Aggregated data query
-    # For per_query=True, we also bring in (query_index + 1) as query_index
 
     # clear all figures before plotting
     plt.close('all')
@@ -158,7 +154,13 @@ def plot_aggregation(group_column: str, con: duckdb.DuckDBPyConnection, from_que
         ax.set_xlabel("Query Index")
         ax.set_ylabel("Average Runtime")
         ax.set_title(f'Average Runtime by Query Index grouped by {group_column}')
-        ax.legend(loc='upper left')
+
+        # Place legend **outside** the plot area so it doesn't cover bars
+        # Adjust bbox_to_anchor to fine‑tune the position (x, y) just outside the axes
+        ax.legend(loc='center left', bbox_to_anchor=(1.02, 0.5), frameon=False)
+
+        # Make sure everything fits, including the legend
+        fig.tight_layout()
 
         # Save the plot
         plot_path = os.path.join(path, f'{group_column}_grouped.png')
