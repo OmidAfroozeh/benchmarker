@@ -241,18 +241,18 @@ CLICK_BENCH_QUERIES: List[dict] = [
     #         "duckdb": "SELECT WatchID, ClientIP, COUNT(*) AS c, SUM(IsRefresh), AVG(ResolutionWidth) FROM hits GROUP BY WatchID, ClientIP ORDER BY c DESC LIMIT 10;"
     #     }
     # },
-    {
-        'name': 'q33',
-        'index': 33,
-        'run_script': {
-            "duckdb": "SELECT URL, COUNT(*) AS c FROM hits GROUP BY URL ORDER BY c DESC LIMIT 10;"
-        }
-    },
+    # {
+    #     'name': 'q33',
+    #     'index': 33,
+    #     'run_script': {
+    #         "duckdb": "SELECT URL, COUNT(*) AS c FROM hits GROUP BY URL ORDER BY c DESC LIMIT 10;"
+    #     }
+    # },
     {
         'name': 'q34',
         'index': 34,
         'run_script': {
-            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits2 GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
         }
     },
     # {
@@ -262,27 +262,27 @@ CLICK_BENCH_QUERIES: List[dict] = [
     #         "duckdb": "SELECT ClientIP, ClientIP - 1, ClientIP - 2, ClientIP - 3, COUNT(*) AS c FROM hits GROUP BY ClientIP, ClientIP - 1, ClientIP - 2, ClientIP - 3 ORDER BY c DESC LIMIT 10;"
     #     }
     # },
-    {
-        'name': 'q36',
-        'index': 36,
-        'run_script': {
-            "duckdb": "SELECT URL, COUNT(*) AS PageViews FROM hits WHERE CounterID = 62 AND EventDate >= '2013-07-01' AND EventDate <= '2013-07-31' AND DontCountHits = 0 AND IsRefresh = 0 AND URL <> '' GROUP BY URL ORDER BY PageViews DESC LIMIT 10;"
-        }
-    },
-    {
-        'name': 'q37',
-        'index': 37,
-        'run_script': {
-            "duckdb": "SELECT Title, COUNT(*) AS PageViews FROM hits WHERE CounterID = 62 AND EventDate >= '2013-07-01' AND EventDate <= '2013-07-31' AND DontCountHits = 0 AND IsRefresh = 0 AND Title <> '' GROUP BY Title ORDER BY PageViews DESC LIMIT 10;"
-        }
-    },
-    {
-        'name': 'q38',
-        'index': 38,
-        'run_script': {
-            "duckdb": "SELECT URL, COUNT(*) AS PageViews FROM hits WHERE CounterID = 62 AND EventDate >= '2013-07-01' AND EventDate <= '2013-07-31' AND IsRefresh = 0 AND IsLink <> 0 AND IsDownload = 0 GROUP BY URL ORDER BY PageViews DESC LIMIT 10 OFFSET 1000;"
-        }
-    },
+    # {
+    #     'name': 'q36',
+    #     'index': 36,
+    #     'run_script': {
+    #         "duckdb": "SELECT URL, COUNT(*) AS PageViews FROM hits WHERE CounterID = 62 AND EventDate >= '2013-07-01' AND EventDate <= '2013-07-31' AND DontCountHits = 0 AND IsRefresh = 0 AND URL <> '' GROUP BY URL ORDER BY PageViews DESC LIMIT 10;"
+    #     }
+    # },
+    # {
+    #     'name': 'q37',
+    #     'index': 37,
+    #     'run_script': {
+    #         "duckdb": "SELECT Title, COUNT(*) AS PageViews FROM hits WHERE CounterID = 62 AND EventDate >= '2013-07-01' AND EventDate <= '2013-07-31' AND DontCountHits = 0 AND IsRefresh = 0 AND Title <> '' GROUP BY Title ORDER BY PageViews DESC LIMIT 10;"
+    #     }
+    # },
+    # {
+    #     'name': 'q38',
+    #     'index': 38,
+    #     'run_script': {
+    #         "duckdb": "SELECT URL, COUNT(*) AS PageViews FROM hits WHERE CounterID = 62 AND EventDate >= '2013-07-01' AND EventDate <= '2013-07-31' AND IsRefresh = 0 AND IsLink <> 0 AND IsDownload = 0 GROUP BY URL ORDER BY PageViews DESC LIMIT 10 OFFSET 1000;"
+    #     }
+    # },
     # {
     #     'name': 'q40',
     #     'index': 40,
@@ -494,7 +494,7 @@ SELECT *
         epoch_ms(EventTime * 1000) AS EventTime,
         epoch_ms(ClientEventTime * 1000) AS ClientEventTime,
         epoch_ms(LocalEventTime * 1000) AS LocalEventTime)
-FROM read_parquet([format('https://datasets.clickhouse.com/hits_compatible/athena_partitioned/hits_{{}}.parquet', x) for x in range(0, 50)], binary_as_string=True);
+FROM read_parquet([format('https://datasets.clickhouse.com/hits_compatible/athena_partitioned/hits_{{}}.parquet', x) for x in range(0, 100)], binary_as_string=True);
 
        """
 

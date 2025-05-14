@@ -1,0 +1,11 @@
+run_name,run_date,data_config,query,query_index,system_name,system_version,system,system_setting,min_runtime,avg_runtime
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q33,33,duckdb,latest_build_main,"{'name': 'duckdb', 'version': 'latest_build_main'}",{'n_threads': 1},0.721878666,0.773891375
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q33,33,duckdb,DUCKDB_emit_DICT,"{'name': 'duckdb', 'version': 'DUCKDB_emit_DICT'}",{'n_threads': 1},0.632726791,0.6343530418000001
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q34,34,duckdb,latest_build_main,"{'name': 'duckdb', 'version': 'latest_build_main'}",{'n_threads': 1},0.734082541,0.7354988498000001
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q34,34,duckdb,DUCKDB_emit_DICT,"{'name': 'duckdb', 'version': 'DUCKDB_emit_DICT'}",{'n_threads': 1},0.722045667,0.724481125
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q36,36,duckdb,latest_build_main,"{'name': 'duckdb', 'version': 'latest_build_main'}",{'n_threads': 1},0.058751458,0.0600080916
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q36,36,duckdb,DUCKDB_emit_DICT,"{'name': 'duckdb', 'version': 'DUCKDB_emit_DICT'}",{'n_threads': 1},0.055480333,0.05559749979999999
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q37,37,duckdb,latest_build_main,"{'name': 'duckdb', 'version': 'latest_build_main'}",{'n_threads': 1},0.016623375,0.0177474832
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q37,37,duckdb,DUCKDB_emit_DICT,"{'name': 'duckdb', 'version': 'DUCKDB_emit_DICT'}",{'n_threads': 1},0.010820542,0.0109861586
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q38,38,duckdb,latest_build_main,"{'name': 'duckdb', 'version': 'latest_build_main'}",{'n_threads': 1},0.016708417,0.0174601334
+USSR_vs_baseline_clickbench,2025-05-13-16-44-16,{},q38,38,duckdb,DUCKDB_emit_DICT,"{'name': 'duckdb', 'version': 'DUCKDB_emit_DICT'}",{'n_threads': 1},0.0158865,0.0162375252
