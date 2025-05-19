@@ -436,7 +436,7 @@ DUCK_DB_USSR_stable_version_operator_bttr_strs_local: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/6c508c121f51dd2a1759359243efb51139114e09'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/622273903fdd0c1113e92def80b7e6aac1936f5c'
         },
     },
 }
@@ -450,6 +450,19 @@ DUCKDB_emit_DICT: System = {
         'location': {
             'location': 'github',
             'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/8185e0309827930839f9fafb070bdb814c7fcb92'
+        },
+    },
+}
+
+ussr_2x_size: System = {
+    **DUCK_DB_MAIN,
+    'version': 'ussr_2x_size',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/673e806ce6da939dd60f704933c0d50b3fcff870'
         },
     },
 }
