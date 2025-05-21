@@ -10,237 +10,7 @@ from src.utils import get_data_path, pad
 logger = get_logger(__name__)
 
 CLICK_BENCH_QUERIES: List[dict] = [
-    # {
-    #     'name': 'q01',
-    #     'index': 1,
-    #     'run_script': {
-    #         "duckdb": "SELECT COUNT(*) FROM hits;"
-    #     }
-    # },
-    # {
-    #     'name': 'q02',
-    #     'index': 2,
-    #     'run_script': {
-    #         "duckdb": "SELECT COUNT(*) FROM hits WHERE AdvEngineID <> 0;"
-    #     }
-    # },
-    # {
-    #     'name': 'q03',
-    #     'index': 3,
-    #     'run_script': {
-    #         "duckdb": "SELECT SUM(AdvEngineID), COUNT(*), AVG(ResolutionWidth) FROM hits;"
-    #     }
-    # },
-    # {
-    #     'name': 'q04',
-    #     'index': 4,
-    #     'run_script': {
-    #         "duckdb": "SELECT AVG(UserID) FROM hits;"
-    #     }
-    # },
-    # {
-    #     'name': 'q05',
-    #     'index': 5,
-    #     'run_script': {
-    #         "duckdb": "SELECT COUNT(DISTINCT UserID) FROM hits;"
-    #     }
-    # },
-    # {
-    #     'name': 'q06',
-    #     'index': 6,
-    #     'run_script': {
-    #         "duckdb": "SELECT COUNT(DISTINCT SearchPhrase) FROM hits;"
-    #     }
-    # },
-    # {
-    #     'name': 'q07',
-    #     'index': 7,
-    #     'run_script': {
-    #         "duckdb": "SELECT MIN(EventDate), MAX(EventDate) FROM hits;"
-    #     }
-    # },
-    # {
-    #     'name': 'q08',
-    #     'index': 8,
-    #     'run_script': {
-    #         "duckdb": "SELECT AdvEngineID, COUNT(*) FROM hits WHERE AdvEngineID <> 0 GROUP BY AdvEngineID ORDER BY COUNT(*) DESC;"
-    #     }
-    # },
-    # {
-    #     'name': 'q09',
-    #     'index': 9,
-    #     'run_script': {
-    #         "duckdb": "SELECT RegionID, COUNT(DISTINCT UserID) AS u FROM hits GROUP BY RegionID ORDER BY u DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q10',
-    #     'index': 10,
-    #     'run_script': {
-    #         "duckdb": "SELECT RegionID, SUM(AdvEngineID), COUNT(*) AS c, AVG(ResolutionWidth), COUNT(DISTINCT UserID) FROM hits GROUP BY RegionID ORDER BY c DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q11',
-    #     'index': 11,
-    #     'run_script': {
-    #         "duckdb": "SELECT MobilePhoneModel, COUNT(DISTINCT UserID) AS u FROM hits WHERE MobilePhoneModel <> '' GROUP BY MobilePhoneModel ORDER BY u DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q12',
-    #     'index': 12,
-    #     'run_script': {
-    #         "duckdb": "SELECT MobilePhone, MobilePhoneModel, COUNT(DISTINCT UserID) AS u FROM hits WHERE MobilePhoneModel <> '' GROUP BY MobilePhone, MobilePhoneModel ORDER BY u DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q13',
-    #     'index': 13,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchPhrase, COUNT(*) AS c FROM hits WHERE SearchPhrase <> '' GROUP BY SearchPhrase ORDER BY c DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q14',
-    #     'index': 14,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchPhrase, COUNT(DISTINCT UserID) AS u FROM hits WHERE SearchPhrase <> '' GROUP BY SearchPhrase ORDER BY u DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q15',
-    #     'index': 15,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchEngineID, SearchPhrase, COUNT(*) AS c FROM hits WHERE SearchPhrase <> '' GROUP BY SearchEngineID, SearchPhrase ORDER BY c DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q16',
-    #     'index': 16,
-    #     'run_script': {
-    #         "duckdb": "SELECT UserID, COUNT(*) FROM hits GROUP BY UserID ORDER BY COUNT(*) DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q17',
-    #     'index': 17,
-    #     'run_script': {
-    #         "duckdb": "SELECT UserID, SearchPhrase, COUNT(*) FROM hits GROUP BY UserID, SearchPhrase ORDER BY COUNT(*) DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q18',
-    #     'index': 18,
-    #     'run_script': {
-    #         "duckdb": "SELECT UserID, SearchPhrase, COUNT(*) FROM hits GROUP BY UserID, SearchPhrase LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q19',
-    #     'index': 19,
-    #     'run_script': {
-    #         "duckdb": "SELECT UserID, extract(minute FROM EventTime) AS m, SearchPhrase, COUNT(*) FROM hits GROUP BY UserID, m, SearchPhrase ORDER BY COUNT(*) DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q20',
-    #     'index': 20,
-    #     'run_script': {
-    #         "duckdb": "SELECT UserID FROM hits WHERE UserID = 435090932899640449;"
-    #     }
-    # },
-    # {
-    #     'name': 'q21',
-    #     'index': 21,
-    #     'run_script': {
-    #         "duckdb": "SELECT COUNT(*) FROM hits WHERE URL LIKE '%google%';"
-    #     }
-    # },
-    # {
-    #     'name': 'q22',
-    #     'index': 22,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchPhrase, MIN(URL), COUNT(*) AS c FROM hits WHERE URL LIKE '%google%' AND SearchPhrase <> '' GROUP BY SearchPhrase ORDER BY c DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q23',
-    #     'index': 23,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchPhrase, MIN(URL), MIN(Title), COUNT(*) AS c, COUNT(DISTINCT UserID) FROM hits WHERE Title LIKE '%Google%' AND URL NOT LIKE '%.google.%' AND SearchPhrase <> '' GROUP BY SearchPhrase ORDER BY c DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q24',
-    #     'index': 24,
-    #     'run_script': {
-    #         "duckdb": "SELECT * FROM hits WHERE URL LIKE '%google%' ORDER BY EventTime LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q25',
-    #     'index': 25,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchPhrase FROM hits WHERE SearchPhrase <> '' ORDER BY EventTime LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q26',
-    #     'index': 26,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchPhrase FROM hits WHERE SearchPhrase <> '' ORDER BY SearchPhrase LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q27',
-    #     'index': 27,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchPhrase FROM hits WHERE SearchPhrase <> '' ORDER BY EventTime, SearchPhrase LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q28',
-    #     'index': 28,
-    #     'run_script': {
-    #         "duckdb": "SELECT CounterID, AVG(STRLEN(URL)) AS l, COUNT(*) AS c FROM hits WHERE URL <> '' GROUP BY CounterID HAVING COUNT(*) > 100000 ORDER BY l DESC LIMIT 25;"
-    #     }
-    # },
-    # {
-    #     'name': 'q29',
-    #     'index': 29,
-    #     'run_script': {
-    #         "duckdb": "SELECT REGEXP_REPLACE(Referer, '^https?://(?:www\\.)?([^/]+)/.*$', '\\1') AS k, AVG(STRLEN(Referer)) AS l, COUNT(*) AS c, MIN(Referer) FROM hits WHERE Referer <> '' GROUP BY k HAVING COUNT(*) > 100000 ORDER BY l DESC LIMIT 25;"
-    #     }
-    # },
-    # {
-    #     'name': 'q30',
-    #     'index': 30,
-    #     'run_script': {
-    #         "duckdb": "SELECT SUM(ResolutionWidth), SUM(ResolutionWidth + 1), SUM(ResolutionWidth + 2), SUM(ResolutionWidth + 3), SUM(ResolutionWidth + 4), SUM(ResolutionWidth + 5), SUM(ResolutionWidth + 6), SUM(ResolutionWidth + 7), SUM(ResolutionWidth + 8), SUM(ResolutionWidth + 9), SUM(ResolutionWidth + 10), SUM(ResolutionWidth + 11), SUM(ResolutionWidth + 12), SUM(ResolutionWidth + 13), SUM(ResolutionWidth + 14), SUM(ResolutionWidth + 15), SUM(ResolutionWidth + 16), SUM(ResolutionWidth + 17), SUM(ResolutionWidth + 18), SUM(ResolutionWidth + 19), SUM(ResolutionWidth + 20), SUM(ResolutionWidth + 21), SUM(ResolutionWidth + 22), SUM(ResolutionWidth + 23), SUM(ResolutionWidth + 24), SUM(ResolutionWidth + 25), SUM(ResolutionWidth + 26), SUM(ResolutionWidth + 27), SUM(ResolutionWidth + 28), SUM(ResolutionWidth + 29), SUM(ResolutionWidth + 30), SUM(ResolutionWidth + 31), SUM(ResolutionWidth + 32), SUM(ResolutionWidth + 33), SUM(ResolutionWidth + 34), SUM(ResolutionWidth + 35), SUM(ResolutionWidth + 36), SUM(ResolutionWidth + 37), SUM(ResolutionWidth + 38), SUM(ResolutionWidth + 39), SUM(ResolutionWidth + 40), SUM(ResolutionWidth + 41), SUM(ResolutionWidth + 42), SUM(ResolutionWidth + 43), SUM(ResolutionWidth + 44), SUM(ResolutionWidth + 45), SUM(ResolutionWidth + 46), SUM(ResolutionWidth + 47), SUM(ResolutionWidth + 48), SUM(ResolutionWidth + 49), SUM(ResolutionWidth + 50), SUM(ResolutionWidth + 51), SUM(ResolutionWidth + 52), SUM(ResolutionWidth + 53), SUM(ResolutionWidth + 54), SUM(ResolutionWidth + 55), SUM(ResolutionWidth + 56), SUM(ResolutionWidth + 57), SUM(ResolutionWidth + 58), SUM(ResolutionWidth + 59), SUM(ResolutionWidth + 60), SUM(ResolutionWidth + 61), SUM(ResolutionWidth + 62), SUM(ResolutionWidth + 63), SUM(ResolutionWidth + 64), SUM(ResolutionWidth + 65), SUM(ResolutionWidth + 66), SUM(ResolutionWidth + 67), SUM(ResolutionWidth + 68), SUM(ResolutionWidth + 69), SUM(ResolutionWidth + 70), SUM(ResolutionWidth + 71), SUM(ResolutionWidth + 72), SUM(ResolutionWidth + 73), SUM(ResolutionWidth + 74), SUM(ResolutionWidth + 75), SUM(ResolutionWidth + 76), SUM(ResolutionWidth + 77), SUM(ResolutionWidth + 78), SUM(ResolutionWidth + 79), SUM(ResolutionWidth + 80), SUM(ResolutionWidth + 81), SUM(ResolutionWidth + 82), SUM(ResolutionWidth + 83), SUM(ResolutionWidth + 84), SUM(ResolutionWidth + 85), SUM(ResolutionWidth + 86), SUM(ResolutionWidth + 87), SUM(ResolutionWidth + 88), SUM(ResolutionWidth + 89) FROM hits;"
-    #     }
-    # },
-    # {
-    #     'name': 'q31',
-    #     'index': 31,
-    #     'run_script': {
-    #         "duckdb": "SELECT SearchEngineID, ClientIP, COUNT(*) AS c, SUM(IsRefresh), AVG(ResolutionWidth) FROM hits WHERE SearchPhrase <> '' GROUP BY SearchEngineID, ClientIP ORDER BY c DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q32',
-    #     'index': 32,
-    #     'run_script': {
-    #         "duckdb": "SELECT WatchID, ClientIP, COUNT(*) AS c, SUM(IsRefresh), AVG(ResolutionWidth) FROM hits WHERE SearchPhrase <> '' GROUP BY WatchID, ClientIP ORDER BY c DESC LIMIT 10;"
-    #     }
-    # },
-    # {
-    #     'name': 'q33',
-    #     'index': 33,
-    #     'run_script': {
-    #         "duckdb": "SELECT WatchID, ClientIP, COUNT(*) AS c, SUM(IsRefresh), AVG(ResolutionWidth) FROM hits GROUP BY WatchID, ClientIP ORDER BY c DESC LIMIT 10;"
-    #     }
-    # },
+
     # {
     #     'name': 'q33',
     #     'index': 33,
@@ -252,9 +22,24 @@ CLICK_BENCH_QUERIES: List[dict] = [
         'name': 'q34',
         'index': 34,
         'run_script': {
-            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits2 GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
         }
     },
+    {
+        'name': 'q34',
+        'index': 34,
+        'run_script': {
+            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits_10p GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+        }
+    },
+    {
+        'name': 'q34',
+        'index': 34,
+        'run_script': {
+            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits_50p GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+        }
+    },
+
     # {
     #     'name': 'q36',
     #     'index': 36,

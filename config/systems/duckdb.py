@@ -462,7 +462,59 @@ ussr_2x_size: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/673e806ce6da939dd60f704933c0d50b3fcff870'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/68c47adcb1ec0193bbfb320f91903b8743e9afe2'
+        },
+    },
+}
+
+ussr_2x_size_analyze_all_vecs: System = {
+    **DUCK_DB_MAIN,
+    'version': 'ussr_2x_size_analyze_all_vecs',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/37ba6753d5ede94d4fb81bd866764e5cec94650b'
+        },
+    },
+}
+
+
+ussr_only_extra_branches: System = {
+    **DUCK_DB_MAIN,
+    'version': 'ussr_only_extra_branches',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/6804af683c78340bd47514755d02174c80eff943'
+        },
+    },
+}
+
+main_extra_computation: System = {
+    **DUCK_DB_MAIN,
+    'version': 'main_extra_computation',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/3a76094348fc5a6002ea22e21f2d076c9c6be526'
+        },
+    },
+}
+ussr_16MB: System = {
+    **DUCK_DB_MAIN,
+    'version': 'ussr_16MB',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/310071fe3f0605af6c34d9af3746220cecc4fb90'
         },
     },
 }

@@ -7,23 +7,25 @@ from src.logger import get_logger
 from src.models import DataSet, Benchmark, Query
 from src.utils import get_data_path, pad
 
+# ── NEW DEPENDENCIES ──────────────────────────────────────────────
+import math, string
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import pyarrow as pa, pyarrow.parquet as pq
+# -----------------------------------------------------------------
+
 logger = get_logger(__name__)
 
 MICRO_BENCHMARK_QUERY: List[Query] = [
-    {
-        'name': 'single_column_groupby',
-        'index': 0,
-        'run_script': {
-            "duckdb": "select str1 from varchars group by str1",
-        }
-    },
     {
         'name': 'double_column_groupby',
         'index': 1,
         'run_script': {
             "duckdb": "select str1, str2 from varchars group by str1, str2",
         }
-    },
+    }
 ]
 
 def get_string_len_benchmark(string_len: List[int]) -> Benchmark:
@@ -40,7 +42,7 @@ def get_string_len_benchmark(string_len: List[int]) -> Benchmark:
 
 
 def __get_tpcds_file_path(sf: int) -> str:
-    file_name =  os.path.join('varchars_grp_size', f'varchars-grp-size-{sf}.db')
+    file_name =  os.path.join('meassure', f'overhead-{sf}.db')
     return get_data_path(file_name)
 
 
@@ -60,7 +62,7 @@ def __generate_and_return_string_microbenchmark_data(str_lens: List[int]) -> Lis
             'name': f'tpcds-{sf}',
             'setup_script': setup_script,
             'config': {
-                'group_size': sf
+                'string_length': sf
             }
         }
 
@@ -83,15 +85,14 @@ def __generate_string_microbenchmark_data(str_len: List[int]):
 
         logger.info(f'Started to generate data for string microbenchmark string size {sl} ...')
 
-        TOTAL_ROWS = 1000_000_000
-        div = TOTAL_ROWS // sl
+        # Generate temp_str of length sl
+        base_str = "abds123412341234"
 
         con = duckdb.connect(duckdb_file_path)
         query_tpcds = f"""
-            PRAGMA force_compression='dictionary';
-            CREATE TABLE varchars AS SELECT concat('thisisarandomstringjusttoseeblahblahthisisarandomstringjusttosee', i//{div}) AS str1, concat('thisisarandomstringjusttoseeblahblahthisisarandomstringjusttosee', i//{div}) AS str2 FROM range(100_000_000) tbl(i);
-            checkpoint;
+            CREATE TABLE varchars AS SELECT concat('{base_str}', i) AS str1, concat('{base_str}', i) AS str2 FROM range({sl}) tbl(i);
         """
         con.sql(query_tpcds)
         con.close()
+
 
