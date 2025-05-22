@@ -11,7 +11,7 @@ from src.runner.experiment_runner import run
 
 
 def main():
-    sfs = [18500000]
+    sfs = [100, 1000, 10000, 100000]
     config: RunConfig = {
         'name': 'USSR_vs_baseline_microbenchmark_variable_grp_sizes',
         'run_settings': {
@@ -22,9 +22,9 @@ def main():
             # {'n_threads': 1},
             # {'n_threads': 2},
             # {'n_threads': 4},
-            {'n_threads': 4},
+            {'n_threads': 6},
         ],
-        'systems': [DUCK_DB_MAIN, ussr_2x_size, ussr_16MB],
+        'systems': [DUCK_DB_MAIN, ussr_16MB],
         'benchmarks': get_string_len_benchmark(sfs),
     }
     run(config)

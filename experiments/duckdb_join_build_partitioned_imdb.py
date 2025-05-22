@@ -6,8 +6,7 @@ sys.path.insert(0, root_directory)
 
 
 from config.benchmark.imdb import get_imdb_benchmark
-from config.systems.duckdb import DUCK_DB_PARTITIONED_NO_ATOMICS, DUCK_DB_NIGHTLY_BUILD_LOCALLY, \
-    DUCK_DB_PARTITIONED_WITH_ATOMICS
+from config.systems.duckdb import DUCK_DB_MAIN, ussr_2x_size
 from src.models import RunConfig
 from src.runner.experiment_runner import run
 
@@ -26,7 +25,7 @@ def main():
             {'n_threads': 4},
             {'n_threads': 8},
         ],
-        'systems': [DUCK_DB_NIGHTLY_BUILD_LOCALLY, DUCK_DB_PARTITIONED_NO_ATOMICS, DUCK_DB_PARTITIONED_WITH_ATOMICS],
+        'systems': [DUCK_DB_MAIN, ussr_2x_size],
         'benchmarks': get_imdb_benchmark(),
     }
     run(config)
