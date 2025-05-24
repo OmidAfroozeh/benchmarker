@@ -518,3 +518,67 @@ ussr_16MB: System = {
         },
     },
 }
+
+UnifiedStringDictionary_1MB: System = {
+    **DUCK_DB_MAIN,
+    'version': 'UnifiedStringDictionary_1MB',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/b8629f2ce8dc7ee613b42fd667dcb0408787cdce'
+        },
+    },
+}
+
+UnifiedStringDictionary_2MB: System = {
+    **DUCK_DB_MAIN,
+    'version': 'UnifiedStringDictionary_2MB',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/ce11fb3dec979465db78115a793a11d9919ac174'
+        },
+    },
+}
+
+UnifiedStringDictionary_4MB: System = {
+    **DUCK_DB_MAIN,
+    'version': 'UnifiedStringDictionary_4MB',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/f25882bcdf3c4bb4d80bffe3a0eda42270d12914'
+        },
+    },
+}
+
+UnifiedStringDictionary_8MB: System = {
+    **DUCK_DB_MAIN,
+    'version': 'UnifiedStringDictionary_8MB',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/d4ad84a09e49c7c50c79e65b986b4fa6fb952d53'
+        },
+    },
+}
+UnifiedStringDictionary_16MB: System = {
+    **DUCK_DB_MAIN,
+    'version': 'UnifiedStringDictionary_16MB',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/b6163aaaf118e77c5845da57a2cff572ff129c3c'
+        },
+    },
+}
