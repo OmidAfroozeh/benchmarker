@@ -18,27 +18,27 @@ logger = get_logger(__name__)
 ###############################################################################
 
 MICRO_BENCHMARK_QUERY: List[Query] = [
-    {
-        "name": "single_column_groupby",
-        "index": 0,
-        "run_script": {
-            "duckdb": "select str1 from varchars group by str1",
-        },
-    },
-    {
-        "name": "double_column_groupby",
-        "index": 1,
-        "run_script": {
-            "duckdb": "select str1, str2 from varchars group by str1, str2",
-        },
-    },
-    {
-        "name": "triple_column_groupby",
-        "index": 2,
-        "run_script": {
-            "duckdb": "select str1, str2, str3 from varchars group by str1, str2, str3",
-        },
-    },
+    # {
+    #     "name": "single_column_groupby",
+    #     "index": 0,
+    #     "run_script": {
+    #         "duckdb": "select str1 from varchars group by str1",
+    #     },
+    # },
+    # {
+    #     "name": "double_column_groupby",
+    #     "index": 1,
+    #     "run_script": {
+    #         "duckdb": "select str1, str2 from varchars group by str1, str2",
+    #     },
+    # },
+    # {
+    #     "name": "triple_column_groupby",
+    #     "index": 2,
+    #     "run_script": {
+    #         "duckdb": "select str1, str2, str3 from varchars group by str1, str2, str3",
+    #     },
+    # },
     {
         "name": "double_column_groupby_1_constant",
         "index": 3,
@@ -76,7 +76,7 @@ def _get_db_file_path(string_len: int) -> str:
 def _generate_string_microbenchmark_data(string_lens: List[int]) -> List[DataSet]:
     """Ensure all requested data‑sets exist, generating them if necessary."""
 
-    TOTAL_ROWS = 10_000_000  # keep the original row count
+    TOTAL_ROWS = 100_000_000  # keep the original row count
     N_UNIQUE   = 1_000       # matches the base implementation (10 M / 10 k)
     CHUNK_ROWS = 5_000_000   # reasonable 2 M‑row chunks
 

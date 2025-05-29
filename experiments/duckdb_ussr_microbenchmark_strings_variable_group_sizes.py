@@ -1,32 +1,57 @@
+#!/usr/bin/env python3
+"""
+Micro-benchmark driver (no argparse).
+
+Edit STRING_LEN below to pick the fixed width of the generated strings.
+"""
+
 import os
 import sys
 
+# ── configuration knob ───────────────────────────────────────────────────────
+STRING_LEN = 16          # ← tweak this and rerun
+
+# ── project root on the import path ──────────────────────────────────────────
 root_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 sys.path.insert(0, root_directory)
 
-from config.benchmark.microbenchmark_strings_variable_group_sizes import get_string_len_benchmark
-from config.systems.duckdb import ussr_16MB, ussr_2x_size, DUCK_DB_USSR_stable_version_2x, DUCK_DB_USSR_stable_version, DUCK_DB_USSR_upper_limit, DUCK_DB_USSR, DUCK_DB_MAIN, DUCK_DB_USSR_refactored, DUCK_DB_USSR_memcpy_optimization, DUCK_DB_USSR_new_lock, DUCK_DB_USSR_predicate_materialize_once, DUCK_DB_USSR_no_singleton, DUCK_DB_USSR_no_singleton_new_api
+from config.benchmark.microbenchmark_strings_variable_group_sizes import (
+    get_string_len_benchmark,
+)
+from config.systems.duckdb import (
+    UnifiedStringDictionary_16MB_dev_with_clientcontext, UnifiedStringDictionary_lock_free_16mB, UnifiedStringDictionary_lock_free_512K,
+    DUCK_DB_MAIN,
+)
 from src.models import RunConfig
 from src.runner.experiment_runner import run
 
 
-def main():
-    sfs = [100, 1000, 10000, 100000]
+def main() -> None:
+    # group sizes (cardinalities) used in the benchmark
+    # group_sizes = [100, 500, 1000, 3000, 5000, 10_000]
+    # group_sizes = [100, 10_000, 20_000, 40_000, 80_000, 160_000, 320_000]
+    group_sizes = [100, 5_000, 10_000, 20_000, 40_000, 80_000, 160_000]
+    # group_sizes = [100, 1000, 3000, 5000, 10000, 11000]
+
+
     config: RunConfig = {
-        'name': 'USSR_vs_baseline_microbenchmark_variable_grp_sizes',
-        'run_settings': {
-            'n_parallel': 1,
-            'n_runs': 5,
+        "name": f"USSR_vs_baseline_microbenchmark_variable_grp_sizes_len{STRING_LEN}",
+        "run_settings": {
+            "n_parallel": 1,
+            "n_runs": 6,
         },
-        'system_settings': [
+        "system_settings": [
+            {'n_threads': 8},
             # {'n_threads': 1},
-            # {'n_threads': 2},
             # {'n_threads': 4},
-            {'n_threads': 6},
+            # {'n_threads': 8},
         ],
-        'systems': [DUCK_DB_MAIN, ussr_16MB],
-        'benchmarks': get_string_len_benchmark(sfs),
+        "systems": [DUCK_DB_MAIN, UnifiedStringDictionary_lock_free_16mB],
+        "benchmarks": get_string_len_benchmark(
+            group_sizes, string_len=STRING_LEN
+        ),
     }
+
     run(config)
 
 

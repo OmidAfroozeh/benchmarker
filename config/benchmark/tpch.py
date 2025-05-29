@@ -17,6 +17,14 @@ TPC_H_QUERIES: List[Query] = [
             "duckdb": f"PRAGMA tpch({i + 1});",
         }
     } for i in range(22)
+    # {
+    #     'name': f'tpch{16}',
+    #     'index': 16,
+    #     'run_script': {
+    #         "duckdb": f"PRAGMA tpch({16});",
+    #     }
+    # }
+
 ]
 
 def get_tpch_benchmark(scale_factors: List[int]) -> Benchmark:
@@ -33,7 +41,7 @@ def get_tpch_benchmark(scale_factors: List[int]) -> Benchmark:
 
 
 def __get_tpch_file_path(sf: int) -> str:
-    file_name =  os.path.join('tpch', f'tpch-sf-{sf}.db')
+    file_name =  os.path.join('tpch', f'tpch-sf{sf}.db')
     return get_data_path(file_name)
 
 

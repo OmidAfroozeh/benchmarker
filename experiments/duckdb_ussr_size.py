@@ -1,32 +1,41 @@
+#!/usr/bin/env python3
+"""
+Run the “different USSR sizes” benchmark (Zipf 1.2 skew).
+
+Tweak STRING_LEN below and rerun; no CLI parsing required.
+"""
+
 import os
 import sys
 
+# ── configuration knob ───────────────────────────────────────────────────────
+STRING_LEN = 32        # ← edit this value to the desired fixed string width
+
+# ── project root on the import path ──────────────────────────────────────────
 root_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 sys.path.insert(0, root_directory)
 
 from config.benchmark.microbenchmark_ussr_size import get_string_len_benchmark
-
-from config.systems.duckdb import ussr_16MB, ussr_2x_size, DUCK_DB_USSR_stable_version_operator_bttr_strs_local, DUCK_DB_USSR_stable_version_operator_bttr_strs_flattening, DUCK_DB_USSR_stable_version_operator_bttr_strs_col_seg, DUCK_DB_USSR_stable_version_operator, DUCK_DB_USSR_stable_version_2x, DUCK_DB_USSR_upper_limit, DUCK_DB_USSR_stable_version, DUCK_DB_USSR, DUCK_DB_MAIN, DUCK_DB_USSR_refactored, DUCK_DB_USSR_memcpy_optimization, DUCK_DB_USSR_new_lock, DUCK_DB_USSR_predicate_materialize_once, DUCK_DB_USSR_no_singleton, DUCK_DB_USSR_no_singleton_new_api
+from config.systems.duckdb import (
+    UnifiedStringDictionary_16MB_dev_with_clientcontext,
+    DUCK_DB_MAIN, UnifiedStringDictionary_lock_free_16mB
+)
 from src.models import RunConfig
 from src.runner.experiment_runner import run
 
 
-def main():
-    sfs = [100, 1000, 10000, 100000, 1_000_000, 10_000_000]
+def main() -> None:
+    # cardinalities / group sizes
+    group_sizes = [100, 10_000, 20_000, 40_000, 80_000, 160_000, 320_000]
+
     config: RunConfig = {
-        'name': 'Different_USSR_sizes',
-        'run_settings': {
-            'n_parallel': 1,
-            'n_runs': 5,
-        },
-        'system_settings': [
-            {'n_threads': 8},
-            # {'n_threads': 2},
-            # {'n_threads': 4},
-            # {'n_threads': 8},
-        ],
-        'systems': [DUCK_DB_MAIN, ussr_16MB, ussr_2x_size],
-        'benchmarks': get_string_len_benchmark(sfs),
+        "name": f"Different_USSR_sizes_len{STRING_LEN}",
+        "run_settings": {"n_parallel": 1, "n_runs": 11},
+        "system_settings": [{"n_threads": 8}],
+        "systems": [DUCK_DB_MAIN, UnifiedStringDictionary_lock_free_16mB],
+        "benchmarks": get_string_len_benchmark(
+            group_sizes, string_len=STRING_LEN
+        ),
     }
     run(config)
 

@@ -279,7 +279,7 @@ SELECT *
         epoch_ms(EventTime * 1000) AS EventTime,
         epoch_ms(ClientEventTime * 1000) AS ClientEventTime,
         epoch_ms(LocalEventTime * 1000) AS LocalEventTime)
-FROM read_parquet([format('https://datasets.clickhouse.com/hits_compatible/athena_partitioned/hits_{{}}.parquet', x) for x in range(0, 100)], binary_as_string=True);
+FROM read_parquet([format('https://datasets.clickhouse.com/hits_compatible/athena_partitioned/hits_{{}}.parquet', x) for x in range(0, 30)], binary_as_string=True);
 
        """
 
