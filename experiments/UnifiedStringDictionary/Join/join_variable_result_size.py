@@ -1,26 +1,20 @@
-"""string_benchmark_multi_tables_driver.py – Generator *plus* two‑table benchmark driver
+"""string_benchmark_multi_tables_driver_no_cli.py – Generator *plus* two‑table benchmark driver
+with non‑sequential, overlapped IDs and **configurable constant join cardinality**
 ================================================================================
-A single self‑contained file that provides:
+Standalone **no‑CLI** version of the original driver: simply tweak the constants
+below (especially `EXPECTED_JOIN_ROWS_DEFAULT`, `ROOT_OVERRIDE`, and
+`RUN_BENCHMARK`) and run the file.  All command‑line argument parsing has been
+removed.
 
-1. **Multi‑table string data generator** – create any number of varchar tables
-   inside one DuckDB database.
-2. **Driver** that, for every length × unique × Zipf‑s parameter combination,
-   writes *two* tables – `varchars_a` and `varchars_b` – into *one* database and
-   feeds them to your existing benchmark/runner.
-
-**New in this revision**: every generated table now contains a monotonically
-increasing **`id`** (INTEGER) column, starting at 0 and shared across all
-variant tables. This enables straightforward equi‑joins such as
-`... ON a.id = b.id`.
-
-Usage (defaults are embedded as constants at the bottom):
-```bash
-python string_benchmark_multi_tables_driver.py \
-       --root /mnt/benchmarks  # override base folder if desired
-```
-
-If the `src.*` utilities or the experiment runner aren’t available, the script
-falls back to stubs and prints a dry‑run config instead of executing.
+Key differences vs. the original
+--------------------------------
+1. **No `argparse` / CLI switches** – everything is configured in‑file.
+2. Execution is controlled by a few top‑level constants (see "Runtime control"
+   section).  Changing a constant automatically propagates everywhere.
+3. When run as a script (`python string_benchmark_multi_tables_driver_no_cli.py`)
+   it will (optionally) generate the data **and** launch the benchmark in a
+   single go.  Flip `RUN_BENCHMARK = False` to skip the experiment runner and
+   only build the datasets.
 """
 
 from __future__ import annotations
@@ -71,7 +65,7 @@ except Exception:  # pragma: no cover – standalone mode
 
 try:
     from src.models import Benchmark, DataSet, Query, RunConfig  # type: ignore
-except Exception:  # pragma: no cover – standalone mode
+except Exception:  # pragma: no cover – standalone mode
 
     class Query(TypedDict, total=False):
         name: str
@@ -102,6 +96,7 @@ logger = get_logger(__name__)
 ##############################################################################
 
 DistributionLiteral = Literal["uniform", "zipf"]
+ID_COL = "id"  # primary‑key column shared by both tables
 
 
 @dataclass
@@ -191,9 +186,8 @@ class ColumnSpec:
         return self._pool[self._indices[total_rows][start:end]]
 
 
-# ── Top‑level generator ─────────────────────────────────────────────────────
+# ── Top‑level generator ─────────────────────────────────────────────────----
 
-ID_COLUMN = "id"  # public constant so downstream code can reference the column name
 
 def generate_string_benchmark(
     *,
@@ -201,6 +195,7 @@ def generate_string_benchmark(
     total_rows: int,
     column_specs: List[ColumnSpec],
     table_name: str = "varchars",
+    id_values: Optional[np.ndarray] = None,
     if_exists: Literal["skip", "replace", "error"] = "skip",
     chunk_rows: int = 5_000_000,
     parquet_codec: str = "zstd",
@@ -209,18 +204,14 @@ def generate_string_benchmark(
     cleanup: bool = True,
     global_unique: bool = False,
 ) -> Path:
-    """Create (or append) a Parquet‑backed varchar table inside *duckdb_path*.
-
-    Every row gets a unique sequential integer in the :pydata:`ID_COLUMN`
-    column, starting at 0. The sequence is deterministic and independent of
-    the RNG seed so that identically‑shaped tables (e.g. *A* & *B*) share the
-    same *id*s and can be joined via *id* equality.
-    """
+    """Create (or append) a Parquet‑backed varchar table with a non‑sequential `id`."""
 
     if total_rows <= 0:
         raise ValueError("total_rows must be positive")
     if not column_specs:
         raise ValueError("Need at least one ColumnSpec")
+    if id_values is not None and len(id_values) != total_rows:
+        raise ValueError("id_values length must equal total_rows")
 
     duckdb_path = Path(duckdb_path)
     parquet_dir = duckdb_path.with_suffix("").with_name(f"{table_name}_parquet")
@@ -252,21 +243,21 @@ def generate_string_benchmark(
         logger.info("Writing %d chunk(s) → %s", n_chunks, parquet_dir)
         for c in range(n_chunks):
             start, end = c * chunk_rows, min((c + 1) * chunk_rows, total_rows)
-
-            # Build chunk DataFrame with the mandatory `id` column ----------
-            data: Dict[str, Union[np.ndarray, range]] = {
-                ID_COLUMN: np.arange(start, end, dtype="int64"),
-            }
+            ids_slice = (
+                id_values[start:end]
+                if id_values is not None
+                else np.arange(start, end, dtype=np.int64)
+            )
+            df_dict: Dict[str, object] = {ID_COL: ids_slice}
             for s in column_specs:
-                data[s.name] = s.slice_chunk(total_rows, start, end)
-
-            df = pd.DataFrame(data, copy=False)
-
+                df_dict[s.name] = s.slice_chunk(total_rows, start, end)
+            df = pd.DataFrame(df_dict, copy=False)
             pq.write_table(
                 pa.Table.from_pandas(df, preserve_index=False),
                 parquet_dir / f"chunk_{c:05d}.parquet",
                 compression=parquet_codec,
-                use_dictionary={s.name: s.use_dictionary for s in column_specs},
+                # id → no dictionary encoding; strings honour spec setting
+                use_dictionary={ID_COL: False, **{s.name: s.use_dictionary for s in column_specs}},
                 write_statistics=False,
                 data_page_size=1 << 20,
             )
@@ -278,7 +269,8 @@ def generate_string_benchmark(
     con.execute("PRAGMA force_compression='dictionary'")
     table_present = bool(
         con.execute(
-            "SELECT 1 FROM information_schema.tables WHERE table_name = ?", [table_name]
+            "SELECT 1 FROM information_schema.tables WHERE table_name = ?",
+            [table_name],
         ).fetchone()
     )
 
@@ -289,7 +281,7 @@ def generate_string_benchmark(
         table_present = False
 
     if not table_present:
-        cols = ", ".join([ID_COLUMN] + [s.name for s in column_specs])
+        cols = ", ".join([ID_COL] + [s.name for s in column_specs])
         con.execute(
             f"CREATE TABLE {table_name} AS SELECT {cols} FROM read_parquet('{parquet_dir}/*.parquet')"
         )
@@ -304,17 +296,21 @@ def generate_string_benchmark(
     return duckdb_path
 
 
-# ── Helper: build many tables into one DB ───────────────────────────────────
+# ── Helper: build many tables into one DB ─────────────────────────────────--
+
 
 def build_db_with_multiple_tables(
     *,
     duckdb_path: Union[str, Path],
     variants: Sequence[tuple[str, List[ColumnSpec]]],
     total_rows: int,
+    id_values_map: Optional[Dict[str, np.ndarray]] = None,
     chunk_rows: int = 1_000_000,
     parquet_codec: str = "zstd",
     seed_base: int = 42,
 ) -> Path:
+    """Generate/append each variant; optional explicit ID arrays per table."""
+
     for idx, (tbl_name, specs) in enumerate(variants, start=1):
         generate_string_benchmark(
             duckdb_path=duckdb_path,
@@ -322,6 +318,7 @@ def build_db_with_multiple_tables(
             if_exists="skip",
             total_rows=total_rows,
             column_specs=specs,
+            id_values=None if id_values_map is None else id_values_map[tbl_name],
             chunk_rows=chunk_rows,
             parquet_codec=parquet_codec,
             seed=seed_base + idx,
@@ -342,25 +339,27 @@ from config.systems.duckdb import (
     DUCK_DB_MAIN,
     UnifiedStringDictionary_lock_free_16mB,
     UnifiedStringDictionary_lock_free_512K,
-    UnifiedStringDictionary_16MB_with_column_data_collection
-)  # type: ignore
+)
 from src.runner.experiment_runner import run  # type: ignore
 
-
 # get_data_path helper -------------------------------------------------------
-try:
-    from src.utils import get_data_path  # type: ignore
-except Exception:
 
-    def get_data_path(rel: str) -> str:  # noqa: D401 – helper
-        return str(Path("/mnt/benchmarks") / rel)
+from src.utils import get_data_path  # type: ignore
+
+
+def get_data_path(rel: str) -> str:  # noqa: D401 – helper
+    return str(Path(".") / rel)
 
 # Grid parameters ------------------------------------------------------------
 LengthSpec = Union[int, Tuple[int, int]]
-LENGTH_SPECS: Sequence[LengthSpec] = [32]
-TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
-N_UNIQUE_LIST: Sequence[int] = [105]
-S_VALUES: Sequence[float] = [0.0]
+LENGTH_SPECS:    Sequence[LengthSpec] = [32]
+TOTAL_ROWS_LIST: Sequence[int]        = [5_000]
+N_UNIQUE_LIST:   Sequence[int]        = [1000]
+S_VALUES:        Sequence[float]      = [0.0]
+
+# >>>>>>>>>> SET THE DEFAULT JOIN CARDINALITY IN ONE PLACE <<<<<<<<<<<<<<
+EXPECTED_JOIN_ROWS_DEFAULT: Optional[int] = 10_000_000  # e.g. 100_000 or None for all rows
+# -----------------------------------------------------------------------
 
 CHUNK_ROWS = 1_000_000
 PARQUET_CODEC = "zstd"
@@ -371,10 +370,10 @@ TABLE_A, TABLE_B = "varchars_a", "varchars_b"
 # Queries --------------------------------------------------------------------
 CUSTOM_QUERIES: List[Query] = [
     {
-        "name": "rowwise_join",
+        "name": "id_equality_join",
         "index": 0,
         "run_script": {
-            "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id"
+            "duckdb": f"SELECT COUNT(*) AS cnt FROM {TABLE_A} AS a JOIN {TABLE_B} AS b USING({ID_COL})"
         },
     },
 ]
@@ -386,7 +385,7 @@ def len_key(spec: LengthSpec) -> str:
 
 
 def build_db_path(len_spec: LengthSpec, n_unique: int, s_val: float, root: Optional[Path] = None) -> Path:
-    dist_dir = f"varchars_grp_size_zipf_join_{s_val}"
+    dist_dir = f"varchars_grp_size_zipf{s_val}"
     len_dir = f"len_{len_key(len_spec)}"
     fname = f"varchars-grp-size-{n_unique}.db"
     rel = os.path.join(dist_dir, len_dir, fname)
@@ -403,21 +402,49 @@ def make_column_specs(spec: LengthSpec, n_unique: int, s_val: float) -> List[Col
 
 # Assemble datasets ----------------------------------------------------------
 
-def assemble_datasets(root: Optional[Path] = None) -> List[DataSet]:
+def assemble_datasets(*, root: Optional[Path] = None, join_rows_override: Optional[int] = None) -> List[DataSet]:
     datasets: List[DataSet] = []
+
     for idx, (len_spec, rows, uniques, s_val) in enumerate(
-        (
-            x
-            for x in __import__("itertools").product(
-                LENGTH_SPECS, TOTAL_ROWS_LIST, N_UNIQUE_LIST, S_VALUES
-            )
-        ),
+        (x for x in __import__("itertools").product(LENGTH_SPECS, TOTAL_ROWS_LIST, N_UNIQUE_LIST, S_VALUES)),
         start=1,
     ):
+        # Determine how many IDs should overlap between the two tables
+        join_rows = (
+            min(join_rows_override, rows) if join_rows_override is not None else rows
+        )
+        if join_rows <= 0:
+            raise ValueError("join_rows must be positive")
+
         db_path = build_db_path(len_spec, uniques, s_val, root)
         db_path.parent.mkdir(parents=True, exist_ok=True)
 
-        # generate both tables (skip if present)
+        # ── Generate matching, non‑sequential ID pools ────────────────────
+        rng = np.random.default_rng(SEED_BASE + idx)
+        id_pool_size = rows * 10  # plenty of headroom for uniqueness
+        overlap_ids = rng.choice(id_pool_size, size=join_rows, replace=False)  # shared
+
+        remaining_pool = np.setdiff1d(np.arange(id_pool_size), overlap_ids, assume_unique=True)
+        ids_a_extra = (
+            rng.choice(remaining_pool, size=rows - join_rows, replace=False)
+            if rows > join_rows
+            else np.empty(0, dtype=np.int64)
+        )
+        remaining_pool_for_b = np.setdiff1d(remaining_pool, ids_a_extra, assume_unique=True)
+        ids_b_extra = (
+            rng.choice(remaining_pool_for_b, size=rows - join_rows, replace=False)
+            if rows > join_rows
+            else np.empty(0, dtype=np.int64)
+        )
+
+        ids_a = np.concatenate([overlap_ids, ids_a_extra]).astype(np.int64)
+        ids_b = np.concatenate([overlap_ids, ids_b_extra]).astype(np.int64)
+        rng.shuffle(ids_a)
+        rng.shuffle(ids_b)
+
+        id_values_map = {TABLE_A: ids_a, TABLE_B: ids_b}
+
+        # ── Generate both tables (skip if already present) ─────────────────
         build_db_with_multiple_tables(
             duckdb_path=db_path,
             variants=[
@@ -425,6 +452,7 @@ def assemble_datasets(root: Optional[Path] = None) -> List[DataSet]:
                 (TABLE_B, make_column_specs(len_spec, uniques, s_val)),
             ],
             total_rows=rows,
+            id_values_map=id_values_map,
             chunk_rows=CHUNK_ROWS,
             parquet_codec=PARQUET_CODEC,
             seed_base=SEED_BASE + idx * 10,
@@ -441,6 +469,7 @@ def assemble_datasets(root: Optional[Path] = None) -> List[DataSet]:
                     "n_unique": uniques,
                     "zipf_s": s_val,
                     "tables": [TABLE_A, TABLE_B],
+                    "expected_join_rows": join_rows,
                 },
             }
         )
@@ -449,51 +478,58 @@ def assemble_datasets(root: Optional[Path] = None) -> List[DataSet]:
 
 # Build benchmark ------------------------------------------------------------
 
-def build_benchmark(root: Optional[Path] = None) -> Benchmark:
+def build_benchmark(*, root: Optional[Path] = None, join_rows_override: Optional[int] = None) -> Benchmark:
     return {
-        "name": "string_benchmark_zipf_grid_two_tables",
-        "datasets": assemble_datasets(root),
+        "name": "string_benchmark_zipf_grid_two_tables_with_id_pool",
+        "datasets": assemble_datasets(root=root, join_rows_override=join_rows_override),
         "queries": CUSTOM_QUERIES,
     }
 
 
 # Runtime settings -----------------------------------------------------------
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
-SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, UnifiedStringDictionary_16MB_with_column_data_collection]
+SYSTEM_SETTINGS = [{"n_threads": 1}]
+SYSTEMS = [DUCK_DB_MAIN, UnifiedStringDictionary_lock_free_16mB]
 
+##############################################################################
+# ░░ Runtime control ░░                                                      #
+##############################################################################
 
-# Main entry point -----------------------------------------------------------
+# Folder where the benchmark DBs will be created (None → default repo path)
+ROOT_OVERRIDE: Optional[Path] = None
+
+# Flip this to False if you only want to build the data and *not* launch the
+# runner.  Handy when the experiment runner isn't available in the environment.
+RUN_BENCHMARK: bool = True
+
+# If you wish to override the default join cardinality for *all* datasets,
+# set it here (None → fall back to EXPECTED_JOIN_ROWS_DEFAULT defined above).
+JOIN_ROWS_OVERRIDE: Optional[int] = None
+
+##############################################################################
+# ░░ Main – entry point without CLI ░░                                       #
+##############################################################################
 
 def main() -> None:
-    import argparse
-
-    p = argparse.ArgumentParser(
-        description="Generate two‑table varchar benchmarks (with row IDs) and optionally run them"
+    logger.info("Starting dataset generation (CLI‑less mode)…")
+    benchmark = build_benchmark(
+        root=ROOT_OVERRIDE, join_rows_override=JOIN_ROWS_OVERRIDE or EXPECTED_JOIN_ROWS_DEFAULT
     )
-    p.add_argument(
-        "--root",
-        type=Path,
-        default=None,
-        help="Override benchmark base folder (defaults to get_data_path)",
-    )
-    p.add_argument("--norun", action="store_true", help="Only generate data – do not launch runner")
-    args = p.parse_args()
 
-    benchmark = build_benchmark(args.root)
+    if not RUN_BENCHMARK:
+        logger.info("RUN_BENCHMARK = False → data generation complete; skipping runner.")
+        return
 
     cfg: RunConfig = {
-        "name": "USSR_vs_baseline_zipf_grid_two_tables",
+        "name": "USSR_vs_baseline_zipf_grid_two_tables_with_id_pool",
         "run_settings": RUN_SETTINGS,
         "system_settings": SYSTEM_SETTINGS,
         "systems": SYSTEMS,
         "benchmarks": benchmark,
     }
 
-    if args.norun:
-        logger.info("Data generation complete – skipping run (\\--norun)\nConfig: %s", cfg)
-    else:
-        run(cfg)
+    logger.info("Launching experiment runner…")
+    run(cfg)
 
 
 if __name__ == "__main__":
@@ -507,5 +543,4 @@ __all__ = [
     "ColumnSpec",
     "generate_string_benchmark",
     "build_db_with_multiple_tables",
-    "ID_COLUMN",
 ]

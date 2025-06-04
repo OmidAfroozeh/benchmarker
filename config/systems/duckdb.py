@@ -621,3 +621,40 @@ UnifiedStringDictionary_lock_free_16mB: System = {
         },
     },
 }
+
+UnifiedStringDictionary_16MB_with_column_data_collection: System = {
+    **DUCK_DB_MAIN,
+    'version': 'UnifiedStringDictionary_16MB_with_column_data_collection',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/f3e1086d1b379006b6657078df7aa1283eb6715e'
+        },
+    },
+}
+DUCKDB_1dot3: System = {
+    **DUCK_DB_MAIN,
+    'version': 'DUCKDB_1dot3',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/duckdb/duckdb/tree/v1.3-ossivalis'
+        },
+    },
+}
+USSR_salt_ptr: System = {
+    **DUCK_DB_MAIN,
+    'version': 'USSR_salt_ptr',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/duckdb/duckdb/commit/8f4f4712955b5c4c425aec3f2b4ecd09f46d99de'
+        },
+    },
+}

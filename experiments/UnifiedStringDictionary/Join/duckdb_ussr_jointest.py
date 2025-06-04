@@ -334,18 +334,21 @@ def build_db_with_multiple_tables(
 
 # Optional repo root injection
 root_directory = Path(__file__).resolve().parents[1]
-if str(root_directory) not in sys.path:
-    sys.path.insert(0, str(root_directory))
+sys.path.insert(0, str(root_directory))
+grandparent = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(grandparent))
+great_grandparent = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(great_grandparent))
 
 # Systems & runner -----------------------------------------------------------
 from config.systems.duckdb import (
     DUCK_DB_MAIN,
     UnifiedStringDictionary_lock_free_16mB,
     UnifiedStringDictionary_lock_free_512K,
-    UnifiedStringDictionary_16MB_with_column_data_collection
+    UnifiedStringDictionary_16MB_with_column_data_collection,
+    USSR_salt_ptr
 )  # type: ignore
 from src.runner.experiment_runner import run  # type: ignore
-
 
 # get_data_path helper -------------------------------------------------------
 try:
@@ -357,7 +360,7 @@ except Exception:
 
 # Grid parameters ------------------------------------------------------------
 LengthSpec = Union[int, Tuple[int, int]]
-LENGTH_SPECS: Sequence[LengthSpec] = [32]
+LENGTH_SPECS: Sequence[LengthSpec] = [32, 64]
 TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
 N_UNIQUE_LIST: Sequence[int] = [105]
 S_VALUES: Sequence[float] = [0.0]
@@ -460,7 +463,7 @@ def build_benchmark(root: Optional[Path] = None) -> Benchmark:
 # Runtime settings -----------------------------------------------------------
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, UnifiedStringDictionary_16MB_with_column_data_collection]
+SYSTEMS = [DUCK_DB_MAIN, USSR_salt_ptr]
 
 
 # Main entry point -----------------------------------------------------------
