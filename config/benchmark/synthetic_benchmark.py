@@ -72,7 +72,10 @@ class ColumnSpec:
                 chars = rng.choice(alphabet, size=(size, self.str_len))
                 return ["".join(row) for row in chars]
             lo, hi = self.str_len  # type: ignore[misc]
-            lens = rng.integers(lo, hi + 1, size=size)
+            mean = (lo + hi) / 2
+            stddev = (hi - lo) / 6
+            lens = rng.normal(loc=mean, scale=stddev, size=size).round().astype(int)
+            lens = np.clip(lens, lo, hi)
             out: List[str] = []
             for L in np.unique(lens):
                 cnt = np.sum(lens == L)
