@@ -25,9 +25,10 @@ from config.benchmark.synthetic_benchmark import ColumnSpec, generate_string_ben
 # System definitions & experiment runner
 # ---------------------------------------------------------------------------
 from config.systems.duckdb import (
-    UnifiedStringDictionary_lock_free_16mB,
     DUCK_DB_MAIN,
-    USSR_salt_ptr
+    UnifiedStringDictionary_initial_benchmark,
+    UnifiedStringDictionary_initial_benchmark_32MB_upper_limit,
+    UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion
 )
 from src.models import DataSet, Benchmark, RunConfig, Query
 from src.runner.experiment_runner import run
@@ -55,7 +56,7 @@ S_VALUES: Sequence[float] = [0.0]
 # Which variable to pin (only n_unique supported in this example)
 PIN_VAR = 'n_unique'
 # Values for the pinned variable; e.g., run benchmarks for these unique counts
-PIN_VALUES: Sequence[int] = [100]
+PIN_VALUES: Sequence[int] = [1000]
 
 # ---------------------------------------------------------------------------
 # Fixed generation knobs
@@ -73,21 +74,21 @@ CUSTOM_QUERIES: List[Query] = [
         "index": 0,
         "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2"},
     },
-    {
-        "name": "constant_double_column_groupby",
-        "index": 1,
-        "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
-    },
-    {
-        "name": "single_column_groupby",
-        "index": 2,
-        "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
-    },
-    {
-        "name": "triple_column_groupby",
-        "index": 3,
-        "run_script": {"duckdb": "SELECT str1, str2, str3 FROM varchars GROUP BY str1, str2, str3"},
-    },
+    # {
+    #     "name": "constant_double_column_groupby",
+    #     "index": 1,
+    #     "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
+    # },
+    # {
+    #     "name": "single_column_groupby",
+    #     "index": 2,
+    #     "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
+    # },
+    # {
+    #     "name": "triple_column_groupby",
+    #     "index": 3,
+    #     "run_script": {"duckdb": "SELECT str1, str2, str3 FROM varchars GROUP BY str1, str2, str3"},
+    # },
 ]
 
 # =============================================================================

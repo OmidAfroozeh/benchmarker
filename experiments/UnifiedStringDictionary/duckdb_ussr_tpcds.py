@@ -1,8 +1,15 @@
 import os
 import sys
+from pathlib import Path
 
 root_directory = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 sys.path.insert(0, root_directory)
+root_directory = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(root_directory))
+grandparent = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(grandparent))
+great_grandparent = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(great_grandparent))
 
 from config.benchmark.tpcds import get_tpcds_benchmark
 from config.systems.duckdb import DUCK_DB_USSR_no_singleton_new_api, DUCK_DB_MAIN

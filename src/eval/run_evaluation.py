@@ -24,7 +24,8 @@ def run_evaluation():
                 {{'name': system_name, 'version': system_version}} as system,
                 experiment.system_setting as system_setting,
                 list_min(runtimes) as min_runtime,
-                list_avg(runtimes[2:]) AS avg_runtime
+                list_avg(runtimes[2:]) AS avg_runtime,
+                list_median(runtimes) as median_runtime
             FROM '{runs_path}/*/*/*.json'
         );"""
     con.execute(view_query)
@@ -90,7 +91,7 @@ def eval_system_tuple_group(system_tuple: tuple[dict[str, str], dict[str, str]],
     query = f"""
         SELECT 
             CAST({group_string} AS STRING) as {group_string}_str, 
-            AVG(avg_runtime) as avg_runtime
+            AVG(median_runtime) as avg_runtime
         {from_query}
         AND system = '{str(system_tuple[0]).replace("'", "''")}'
         GROUP BY {group_string}
@@ -101,7 +102,7 @@ def eval_system_tuple_group(system_tuple: tuple[dict[str, str], dict[str, str]],
     query = f"""
         SELECT
             CAST({group_string} AS STRING) as {group_string}_str, 
-            AVG(avg_runtime) as avg_runtime
+            AVG(median_runtime) as avg_runtime
         {from_query}
         AND system = '{str(system_tuple[1]).replace("'", "''")}'
         GROUP BY {group_string}
@@ -249,7 +250,7 @@ def plot_aggregation(group_column: str,
         SELECT 
             replace(CAST({group_column} AS STRING)[2:-2], '''', '') as group_column_string
             {', (query_index + 1) as query_index' if per_query else ''},
-            AVG(avg_runtime) as avg_runtime
+            AVG(median_runtime) as avg_runtime
             {', replace(CAST(' + subplot_group + " AS STRING)[2:-2], '''', '') as " + subplot_group + '_str' if subplot_group else ''} 
         {from_query}
         GROUP BY {group_column} 
@@ -371,8 +372,8 @@ def create_plot(df_aggregated: pd.DataFrame,
         ax.set_xticks(x + width * (len(df_pivot.columns) - 1) / 2, df_pivot.index)
 
         ax.set_xlabel("Query Index")
-        ax.set_ylabel("Average Runtime")
-        ax.set_title(f'Average Runtime by Query Index grouped by {group_column}')
+        ax.set_ylabel("Median Runtime")
+        ax.set_title(f'Median Runtime by Query Index grouped by {group_column}')
         ax.legend(loc='upper left')
 
         # If we’re a standalone figure, save plot & data
@@ -402,8 +403,8 @@ def create_plot(df_aggregated: pd.DataFrame,
                     ha='center', va='bottom')
 
         ax.set_xlabel(group_column)
-        ax.set_ylabel('Average Runtime')
-        ax.set_title(f'Average Runtime by {group_column}')
+        ax.set_ylabel('Median Runtime')
+        ax.set_title(f'Median Runtime by {group_column}')
 
         if is_standalone:
             plot_path = os.path.join(path, f'{group_column}{name_extension}.png')
@@ -437,7 +438,7 @@ def plot_query_vs_dataconfig_system(con: duckdb.DuckDBPyConnection,
             system_name,
             system_version,
             replace(CAST(system_setting AS STRING)[2:-2], '''', '') AS system_setting_str,
-            AVG(avg_runtime)                                         AS avg_runtime
+            AVG(median_runtime)                                         AS avg_runtime
         {from_query}
         GROUP BY query_index, data_config, system_name,
                  system_version, system_setting
@@ -483,8 +484,8 @@ def plot_query_vs_dataconfig_system(con: duckdb.DuckDBPyConnection,
             ha="right"
         )
         ax.set_xlabel("Data Configuration")
-        ax.set_ylabel("Average Runtime (s)")
-        ax.set_title(f"Query {q} – avg runtime per data-config & system variant")
+        ax.set_ylabel("Median Runtime (s)")
+        ax.set_title(f"Query {q} – median runtime per data-config & system variant")
         ax.legend(loc="upper left", fontsize="small", ncol=2)
         plt.tight_layout()
 

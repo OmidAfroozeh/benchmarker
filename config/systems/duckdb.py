@@ -198,7 +198,6 @@ DUCK_DB_NIGHTLY_BUILD_LOCALLY: System = {
     },
 }
 
-
 DUCK_DB_V100: System = {
     **DUCK_DB_MAIN,
     'version': 'v1.0.0',
@@ -219,7 +218,6 @@ DUCK_DB_V113: System = {
     }
 }
 
-
 DUCK_DB_WITHOUT_ATOMICS: System = {
     **DUCK_DB_MAIN,
     'version': 'without-atomics',
@@ -232,7 +230,6 @@ DUCK_DB_WITHOUT_ATOMICS: System = {
         },
     },
 }
-
 
 DUCK_DB_PARTITIONED: System = {
     **DUCK_DB_MAIN,
@@ -323,7 +320,7 @@ DUCK_DB_USSR_no_singleton: System = {
             'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/524c578ac1da5e4aebf422d2d66d67f911279320'
         },
     },
-    
+
 }
 DUCK_DB_USSR_no_singleton_new_api: System = {
     **DUCK_DB_MAIN,
@@ -480,7 +477,6 @@ ussr_2x_size_analyze_all_vecs: System = {
     },
 }
 
-
 ussr_only_extra_branches: System = {
     **DUCK_DB_MAIN,
     'version': 'ussr_only_extra_branches',
@@ -609,52 +605,93 @@ UnifiedStringDictionary_lock_free_512K: System = {
     },
 }
 
-UnifiedStringDictionary_lock_free_16mB: System = {
+UnifiedStringDictionary_initial_benchmark: System = {
     **DUCK_DB_MAIN,
-    'version': 'UnifiedStringDictionary_lock_free_16mB',
+    'version': 'UnifiedStringDictionary_initial_benchmark',
     'build_config': None,
     'build_config': {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/e65233372db0c90ec5193f6cda45e97722677eed'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/1ce26eef6ddd50943985c3703925bd3e73e9fc82'
         },
     },
 }
 
-UnifiedStringDictionary_16MB_with_column_data_collection: System = {
+UnifiedStringDictionary_initial_benchmark_32MB: System = {
     **DUCK_DB_MAIN,
-    'version': 'UnifiedStringDictionary_16MB_with_column_data_collection',
+    'version': 'UnifiedStringDictionary_initial_benchmark_32MB',
     'build_config': None,
     'build_config': {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/f3e1086d1b379006b6657078df7aa1283eb6715e'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/fdd377c37b7d1c084407632307526822a0a1b719'
         },
     },
 }
-DUCKDB_1dot3: System = {
+
+UnifiedStringDictionary_initial_benchmark_64MB: System = {
     **DUCK_DB_MAIN,
-    'version': 'DUCKDB_1dot3',
+    'version': 'UnifiedStringDictionary_initial_benchmark_64MB',
     'build_config': None,
     'build_config': {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/duckdb/duckdb/tree/v1.3-ossivalis'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/572a37ba2bd406a40d28ddfefe21064a7f95bfd4'
         },
     },
 }
-USSR_salt_ptr: System = {
+
+UnifiedStringDictionary_initial_benchmark_32MB_upper_limit: System = {
     **DUCK_DB_MAIN,
-    'version': 'USSR_salt_ptr',
+    'version': 'UnifiedStringDictionary_initial_benchmark_32MB_upper_limit',
     'build_config': None,
     'build_config': {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/duckdb/duckdb/commit/8f4f4712955b5c4c425aec3f2b4ecd09f46d99de'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/00a0fc17a743e6b342c9037a650f2f302503fc5c'
+        },
+    },
+}
+
+UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion: System = {
+    **DUCK_DB_MAIN,
+    'version': 'UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/c0db521d36d0a7d557231e69a4920bfb14c9edda'
+        },
+    },
+}
+
+UnifiedStringDictionary_1GB_full_insertion: System = {
+    **DUCK_DB_MAIN,
+    'version': 'UnifiedStringDictionary_1GB_full_insertion',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/727a64e4dcc882aa5b8fe1dc066f31e053eaaf18'
+        },
+    },
+}
+
+USSR_SALT_CLEAN: System = {
+    **DUCK_DB_MAIN,
+    'version': 'USSR_SALT_CLEAN',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/6dc7f81d2358fb3ad2cf593e52fa39671398dbfb'
         },
     },
 }

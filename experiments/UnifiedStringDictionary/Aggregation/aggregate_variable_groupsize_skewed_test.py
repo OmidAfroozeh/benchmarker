@@ -1,5 +1,12 @@
 from __future__ import annotations
 
+"""String benchmark runner with *two* pinned parameters.
+
+This variant allows you to pin both the Zipf skew (``zipf_s``)
+*and* the string‑length specification so that those parameters do
+not take part in the Cartesian product when generating datasets.
+"""
+
 import itertools
 import os
 import sys
@@ -30,8 +37,7 @@ from config.systems.duckdb import (
     UnifiedStringDictionary_initial_benchmark_32MB_upper_limit,
     UnifiedStringDictionary_initial_benchmark_64MB,
     UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,
-    UnifiedStringDictionary_1GB_full_insertion
-
+    UnifiedStringDictionary_1GB_full_insertion,
 )
 from src.models import DataSet, Benchmark, RunConfig, Query
 from src.runner.experiment_runner import run
@@ -39,26 +45,27 @@ from src.runner.experiment_runner import run
 # ---------------------------------------------------------------------------
 # get_data_path helper (fallback implementation outside repo)
 # ---------------------------------------------------------------------------
-
 from src.utils import get_data_path  # type: ignore
+
 
 # =============================================================================
 # ░░ Parameter grids ░░
 # =============================================================================
 LengthSpec = Union[int, Tuple[int, int]]  # fixed or (min, max)
 
-# default grids
-LENGTH_SPECS: Sequence[LengthSpec] = [16, 32]
-TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
-N_UNIQUE_LIST: Sequence[int] = [1000, 10_000, 50_000, 100_000, 350_000, 500_000, 1_000_000]
-# zipf parameters to pin
-PIN_VAR = 'zipf_s'
-PIN_VALUES: Sequence[float] = [1.0]
+# -- Global grids (used when parameter is *not* pinned) -----------------------
+LENGTH_SPECS_FULL: Sequence[LengthSpec] = [16, 32]
 DEFAULT_S_VALUES: Sequence[float] = [0.0]
 
-# ---------------------------------------------------------------------------
-# Fixed generation knobs
-# ---------------------------------------------------------------------------
+# -- Pinned parameters --------------------------------------------------------
+#   Define *lists* so we can easily iterate over the Cartesian product
+PIN_ZIPF_VALUES: Sequence[float] = [1.0]      # `zipf_s` will be fixed to these values
+PIN_LENGTH_SPECS: Sequence[LengthSpec] = [16, 32]  # string lengths to pin
+
+# -- Remaining generation knobs ----------------------------------------------
+TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
+N_UNIQUE_LIST: Sequence[int] = [1000, 10_000, 50_000, 100_000, 350_000, 500_000, 1_000_000]
+
 CHUNK_ROWS: int = 2_000_000
 PARQUET_CODEC: str = "zstd"
 SEED_BASE: int = 999
@@ -72,16 +79,6 @@ CUSTOM_QUERIES: List[Query] = [
         "index": 0,
         "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2"},
     },
-    # {
-    #     "name": "constant_double_column_groupby",
-    #     "index": 1,
-    #     "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
-    # },
-    # {
-    #     "name": "single_column_groupby",
-    #     "index": 2,
-    #     "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
-    # },
 ]
 
 
@@ -97,7 +94,10 @@ def len_spec_to_key(spec: LengthSpec) -> str:
 
 
 def build_db_path(len_spec: LengthSpec, n_unique: int, s_val: float) -> str:
-    dist_dir = f"varchars_grp_size_zipf={s_val}_nrows={TOTAL_ROWS_LIST[0] / 1_000_000}M_uniques={n_unique}_len={len_spec_to_key(len_spec)}"
+    dist_dir = (
+        f"varchars_grp_size_zipf={s_val}_nrows={TOTAL_ROWS_LIST[0] / 1_000_000}M_"
+        f"uniques={n_unique}_len={len_spec_to_key(len_spec)}"
+    )
     fname = f"varchars-grp-size-{n_unique}.db"
     rel = os.path.join(dist_dir, fname)
     return get_data_path(rel)
@@ -111,11 +111,17 @@ def make_column_specs(spec: LengthSpec, n_unique: int, s_val: float) -> List[Col
 
 
 def assemble_datasets(
-        length_specs: Sequence[LengthSpec] = LENGTH_SPECS,
-        total_rows_list: Sequence[int] = TOTAL_ROWS_LIST,
-        n_unique_list: Sequence[int] = N_UNIQUE_LIST,
-        s_values: Sequence[float] = DEFAULT_S_VALUES,
+    *,
+    length_specs: Sequence[LengthSpec],
+    total_rows_list: Sequence[int] = TOTAL_ROWS_LIST,
+    n_unique_list: Sequence[int] = N_UNIQUE_LIST,
+    s_values: Sequence[float] = DEFAULT_S_VALUES,
 ) -> List[DataSet]:
+    """Assemble datasets for the Cartesian product of the provided parameter lists.
+
+    Any parameter that you want to *pin* should simply be passed as a singleton
+    list (e.g. ``length_specs=[16]``).
+    """
     datasets: List[DataSet] = []
     combo_iter = itertools.product(length_specs, total_rows_list, n_unique_list, s_values)
 
@@ -154,29 +160,38 @@ def assemble_datasets(
 # ░░ Benchmark builder ░░
 # =============================================================================
 
-def build_benchmark(s_values_list: Sequence[float] = DEFAULT_S_VALUES) -> Benchmark:
+def build_benchmark(*, length_specs: Sequence[LengthSpec], s_values_list: Sequence[float]) -> Benchmark:
+    """Build a Benchmark object with the provided (possibly pinned) parameter lists."""
     return {
-        "name": f"string_benchmark_{PIN_VAR}",
-        "datasets": assemble_datasets(s_values=s_values_list),
+        "name": "string_benchmark",
+        "datasets": assemble_datasets(length_specs=length_specs, s_values=s_values_list),
         "queries": CUSTOM_QUERIES,
     }
 
 
 # =============================================================================
-# ░░ Main entry-point ░░
+# ░░ Main entry‑point ░░
 # =============================================================================
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, UnifiedStringDictionary_1GB_full_insertion, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion]
+SYSTEMS = [
+    DUCK_DB_MAIN,
+    UnifiedStringDictionary_1GB_full_insertion,
+    UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,
+]
 CONFIG_BASE_NAME = "USSR_vs_MAIN"
 
 
 def main() -> None:
-    for pinned in PIN_VALUES:
-        # build a benchmark where zipf_s is pinned to a single value
-        benchmark = build_benchmark(s_values_list=[pinned])
+    """Launch experiments for *all* combinations of pinned values."""
+    for s_val, len_spec in itertools.product(PIN_ZIPF_VALUES, PIN_LENGTH_SPECS):
+        benchmark = build_benchmark(length_specs=[len_spec], s_values_list=[s_val])
+
+        config_name = (
+            f"{CONFIG_BASE_NAME}_zipf{s_val}_len{len_spec_to_key(len_spec)}"
+        )
         config: RunConfig = {
-            "name": f"{CONFIG_BASE_NAME}_{PIN_VAR}{pinned}",
+            "name": config_name,
             "run_settings": RUN_SETTINGS,
             "system_settings": SYSTEM_SETTINGS,
             "systems": SYSTEMS,

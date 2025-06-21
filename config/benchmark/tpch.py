@@ -10,21 +10,27 @@ from src.utils import get_data_path, pad
 logger = get_logger(__name__)
 
 TPC_H_QUERIES: List[Query] = [
-    {
-        'name': f'tpch{i + 1}',
-        'index': i,
-        'run_script': {
-            "duckdb": f"PRAGMA tpch({i + 1});",
-        }
-    } for i in range(22)
     # {
-    #     'name': f'tpch{16}',
-    #     'index': 16,
+    #     'name': f'tpch{i + 1}',
+    #     'index': i,
     #     'run_script': {
-    #         "duckdb": f"PRAGMA tpch({16});",
+    #         "duckdb": f"PRAGMA tpch({i + 1});",
     #     }
-    # }
-
+    # } for i in range(22)
+    {
+        'name': f'tpch{16}',
+        'index': 16,
+        'run_script': {
+            "duckdb": f"PRAGMA tpch({16});",
+        }
+    },
+    {
+        'name': f'tpch_varchar_test',
+        'index': 30,
+        'run_script': {
+            "duckdb": f"select * from nation JOIN customer  on nation.n_nation_uuid_str = customer.n_nation_uuid_str;",
+        }
+    }
 ]
 
 def get_tpch_benchmark(scale_factors: List[int]) -> Benchmark:
@@ -88,6 +94,20 @@ def __generate_tpch_data(sfs: List[int]):
             INSTALL tpch;
             LOAD tpch;
             CALL dbgen(sf = {sf});
+            ALTER TABLE nation ADD COLUMN n_nation_uuid UUID DEFAULT uuid();
+
+            -- Step 2: Add varchar version of UUID
+            ALTER TABLE nation ADD COLUMN n_nation_uuid_str VARCHAR;
+            UPDATE nation SET n_nation_uuid_str = n_nation_uuid::VARCHAR;
+            
+            -- Step 3: Add UUID columns to referencing tables
+            ALTER TABLE customer ADD COLUMN n_nation_uuid_str VARCHAR;
+            
+            -- Step 4: Propagate UUIDs to referencing tables
+            UPDATE customer
+            SET n_nation_uuid_str = nation.n_nation_uuid_str
+            FROM nation
+            WHERE customer.c_nationkey = nation.n_nationkey;
         """
         con.sql(query_tpch)
         con.close()

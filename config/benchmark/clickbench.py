@@ -22,23 +22,44 @@ CLICK_BENCH_QUERIES: List[dict] = [
         'name': 'q34',
         'index': 34,
         'run_script': {
-            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+            "duckdb": "SELECT 1, URL,  COUNT(*) AS c FROM hits GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
         }
     },
     {
-        'name': 'q34',
-        'index': 34,
+        'name': 'q35',
+        'index': 35,
         'run_script': {
-            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits_10p GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+            "duckdb": "SELECT 1, URL FROM hits GROUP BY 1, URL;"
         }
     },
     {
-        'name': 'q34',
-        'index': 34,
+        'name': 'q36',
+        'index': 36,
         'run_script': {
-            "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits_50p GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+            "duckdb": "SELECT 1, Title,  COUNT(*) AS c FROM hits GROUP BY 1, Title ORDER BY c DESC LIMIT 10;"
         }
     },
+    {
+        'name': 'q37',
+        'index': 37,
+        'run_script': {
+            "duckdb": "SELECT 1, Title FROM hits GROUP BY 1, Title;"
+        }
+    },
+    # {
+    #     'name': 'q34',
+    #     'index': 34,
+    #     'run_script': {
+    #         "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits_10p GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+    #     }
+    # },
+    # {
+    #     'name': 'q34',
+    #     'index': 34,
+    #     'run_script': {
+    #         "duckdb": "SELECT 1, URL, COUNT(*) AS c FROM hits_50p GROUP BY 1, URL ORDER BY c DESC LIMIT 10;"
+    #     }
+    # },
 
     # {
     #     'name': 'q36',
@@ -104,7 +125,6 @@ CLICK_BENCH_QUERIES: List[dict] = [
     #     }
     # },
 ]
-
 def get_clickbench() -> Benchmark:
 
     datasets: List[DataSet] = __generate_and_return_clickbenchdataset()
@@ -279,7 +299,7 @@ SELECT *
         epoch_ms(EventTime * 1000) AS EventTime,
         epoch_ms(ClientEventTime * 1000) AS ClientEventTime,
         epoch_ms(LocalEventTime * 1000) AS LocalEventTime)
-FROM read_parquet([format('https://datasets.clickhouse.com/hits_compatible/athena_partitioned/hits_{{}}.parquet', x) for x in range(0, 30)], binary_as_string=True);
+FROM read_parquet([format('https://datasets.clickhouse.com/hits_compatible/athena_partitioned/hits_{{}}.parquet', x) for x in range(0, 100)], binary_as_string=True);
 
        """
 

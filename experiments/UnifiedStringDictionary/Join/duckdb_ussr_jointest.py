@@ -343,10 +343,7 @@ sys.path.insert(0, str(great_grandparent))
 # Systems & runner -----------------------------------------------------------
 from config.systems.duckdb import (
     DUCK_DB_MAIN,
-    UnifiedStringDictionary_lock_free_16mB,
-    UnifiedStringDictionary_lock_free_512K,
-    UnifiedStringDictionary_16MB_with_column_data_collection,
-    USSR_salt_ptr
+    UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion
 )  # type: ignore
 from src.runner.experiment_runner import run  # type: ignore
 
@@ -463,7 +460,7 @@ def build_benchmark(root: Optional[Path] = None) -> Benchmark:
 # Runtime settings -----------------------------------------------------------
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, USSR_salt_ptr]
+SYSTEMS = [DUCK_DB_MAIN, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion]
 
 
 # Main entry point -----------------------------------------------------------
