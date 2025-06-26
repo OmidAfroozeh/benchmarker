@@ -246,7 +246,7 @@ def generate_string_benchmark(
     # load into DuckDB ----------------------------------------------------
     logger.info("Creating DuckDB → %s", duckdb_path)
     con = duckdb.connect(duckdb_path)
-    con.execute("PRAGMA force_compression='dictionary'")
+    # con.execute("PRAGMA force_compression='dictionary'")
     col_list = ", ".join(spec.name for spec in column_specs)
     con.execute(f"CREATE TABLE varchars AS SELECT {col_list} FROM read_parquet('{parquet_dir}/*.parquet')")
     con.execute("CHECKPOINT")

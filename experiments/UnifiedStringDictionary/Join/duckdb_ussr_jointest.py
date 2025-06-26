@@ -343,7 +343,8 @@ sys.path.insert(0, str(great_grandparent))
 # Systems & runner -----------------------------------------------------------
 from config.systems.duckdb import (
     DUCK_DB_MAIN,
-    UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion
+    USSR_SALT_CLEAN,
+    Unified_String_Dictionary
 )  # type: ignore
 from src.runner.experiment_runner import run  # type: ignore
 
@@ -359,7 +360,7 @@ except Exception:
 LengthSpec = Union[int, Tuple[int, int]]
 LENGTH_SPECS: Sequence[LengthSpec] = [32, 64]
 TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
-N_UNIQUE_LIST: Sequence[int] = [105]
+N_UNIQUE_LIST: Sequence[int] = [1050]
 S_VALUES: Sequence[float] = [0.0]
 
 CHUNK_ROWS = 1_000_000
@@ -374,7 +375,21 @@ CUSTOM_QUERIES: List[Query] = [
         "name": "rowwise_join",
         "index": 0,
         "run_script": {
-            "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id"
+            "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id;"
+        },
+    },
+    {
+        "name": "rowwise_join",
+        "index": 2,
+        "run_script": {
+            "duckdb": f"select count(*) from(select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id);"
+        },
+    },
+        {
+        "name": "rowwise_join",
+        "index": 1,
+        "run_script": {
+            "duckdb": f"select count(*) from varchars_a join varchars_b on varchars_a.str1 = varchars_b.str1"
         },
     },
 ]
@@ -398,6 +413,9 @@ def make_column_specs(spec: LengthSpec, n_unique: int, s_val: float) -> List[Col
         ColumnSpec("str1", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
         ColumnSpec("str2", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
         ColumnSpec("str3", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
+        ColumnSpec("str4", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
+        ColumnSpec("str5", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
+        ColumnSpec("str6", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
     ]
 
 
@@ -460,7 +478,7 @@ def build_benchmark(root: Optional[Path] = None) -> Benchmark:
 # Runtime settings -----------------------------------------------------------
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion]
+SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary]
 
 
 # Main entry point -----------------------------------------------------------

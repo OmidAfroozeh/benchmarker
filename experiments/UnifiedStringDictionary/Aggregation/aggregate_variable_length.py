@@ -28,7 +28,10 @@ from config.systems.duckdb import (
     DUCK_DB_MAIN,
     UnifiedStringDictionary_initial_benchmark,
     UnifiedStringDictionary_initial_benchmark_32MB_upper_limit,
-    UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion
+    UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,
+    USSR_SALT_CLEAN,
+    USSR_SALT_CLEAN_FLAT_VEC_JOIN_NEW,
+    Unified_String_Dictionary
 )
 from src.models import DataSet, Benchmark, RunConfig, Query
 from src.runner.experiment_runner import run
@@ -45,7 +48,7 @@ from src.utils import get_data_path  # type: ignore
 LengthSpec = Union[int, Tuple[int, int]]  # fixed or (min, max)
 
 # default grids
-LENGTH_SPECS: Sequence[LengthSpec] = [8, 16, 32, 64, 128]
+LENGTH_SPECS: Sequence[LengthSpec] = [8, 16, 32, 64, 128, 255, 512, (8,120)]
 TOTAL_ROWS_LIST: Sequence[int] = [10_000_000]
 N_UNIQUE_LIST: Sequence[int] = [100]
 S_VALUES: Sequence[float] = [0.0]
@@ -56,7 +59,7 @@ S_VALUES: Sequence[float] = [0.0]
 # Which variable to pin (only n_unique supported in this example)
 PIN_VAR = 'n_unique'
 # Values for the pinned variable; e.g., run benchmarks for these unique counts
-PIN_VALUES: Sequence[int] = [1000]
+PIN_VALUES: Sequence[int] = [100]
 
 # ---------------------------------------------------------------------------
 # Fixed generation knobs
@@ -74,21 +77,21 @@ CUSTOM_QUERIES: List[Query] = [
         "index": 0,
         "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2"},
     },
-    # {
-    #     "name": "constant_double_column_groupby",
-    #     "index": 1,
-    #     "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
-    # },
-    # {
-    #     "name": "single_column_groupby",
-    #     "index": 2,
-    #     "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
-    # },
-    # {
-    #     "name": "triple_column_groupby",
-    #     "index": 3,
-    #     "run_script": {"duckdb": "SELECT str1, str2, str3 FROM varchars GROUP BY str1, str2, str3"},
-    # },
+    {
+        "name": "constant_double_column_groupby",
+        "index": 1,
+        "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
+    },
+    {
+        "name": "single_column_groupby",
+        "index": 2,
+        "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
+    },
+    {
+        "name": "triple_column_groupby",
+        "index": 3,
+        "run_script": {"duckdb": "SELECT str1, str2, str3 FROM varchars GROUP BY str1, str2, str3"},
+    },
 ]
 
 # =============================================================================
@@ -103,8 +106,8 @@ def len_spec_to_key(spec: LengthSpec) -> str:
 
 
 def build_db_path(len_spec: LengthSpec, n_unique: int, s_val: float) -> str:
-    dist_dir = f"varchars_grp_size_zipf{s_val}"
-    len_dir = f"len_{len_spec_to_key(len_spec)}"
+    dist_dir = f"varchars_variable_length"
+    len_dir = f"len_{len_spec_to_key(len_spec)}_nunique_{n_unique}"
     fname = f"varchars-grp-size-{n_unique}.db"
     rel = os.path.join(dist_dir, len_dir, fname)
     return get_data_path(rel)
@@ -112,9 +115,9 @@ def build_db_path(len_spec: LengthSpec, n_unique: int, s_val: float) -> str:
 
 def make_column_specs(spec: LengthSpec, n_unique: int, s_val: float) -> List[ColumnSpec]:
     return [
-        ColumnSpec("str1", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        ColumnSpec("str2", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        ColumnSpec("str3", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
+        ColumnSpec("str1", n_unique, spec, "uniform", zipf_s=s_val, use_dictionary=True),
+        ColumnSpec("str2", n_unique, spec, "uniform", zipf_s=s_val, use_dictionary=True),
+        ColumnSpec("str3", n_unique, spec, "uniform", zipf_s=s_val, use_dictionary=True),
     ]
 
 
@@ -174,7 +177,7 @@ def build_benchmark(n_unique_list: Sequence[int] = N_UNIQUE_LIST) -> Benchmark:
 
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, USSR_salt_ptr]
+SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary]
 CONFIG_BASE_NAME = "USSR_vs_MAIN"
 
 

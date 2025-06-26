@@ -30,7 +30,10 @@ from config.systems.duckdb import (
     UnifiedStringDictionary_initial_benchmark_32MB_upper_limit,
     UnifiedStringDictionary_initial_benchmark_64MB,
     UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,
-    UnifiedStringDictionary_1GB_full_insertion
+    UnifiedStringDictionary_1GB_full_insertion,
+    USSR_SALT_CLEAN,
+    Unified_String_Dictionary,
+    Unified_String_Dictionary_256MB_All_dicts
 
 )
 from src.models import DataSet, Benchmark, RunConfig, Query
@@ -50,7 +53,7 @@ LengthSpec = Union[int, Tuple[int, int]]  # fixed or (min, max)
 # default grids
 LENGTH_SPECS: Sequence[LengthSpec] = [16, 32]
 TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
-N_UNIQUE_LIST: Sequence[int] = [1000, 10_000, 50_000, 100_000, 350_000, 500_000, 1_000_000]
+N_UNIQUE_LIST: Sequence[int] = [100, 1000, 10000, 30000, 50000, 100_000, 250_000, 500_000, 1_000_000]
 # zipf parameters to pin
 PIN_VAR = 'zipf_s'
 PIN_VALUES: Sequence[float] = [1.0]
@@ -72,11 +75,11 @@ CUSTOM_QUERIES: List[Query] = [
         "index": 0,
         "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2"},
     },
-    # {
-    #     "name": "constant_double_column_groupby",
-    #     "index": 1,
-    #     "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
-    # },
+    {
+        "name": "constant_double_column_groupby",
+        "index": 1,
+        "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
+    },
     # {
     #     "name": "single_column_groupby",
     #     "index": 2,
@@ -167,7 +170,7 @@ def build_benchmark(s_values_list: Sequence[float] = DEFAULT_S_VALUES) -> Benchm
 # =============================================================================
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, UnifiedStringDictionary_1GB_full_insertion, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion]
+SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary_256MB_All_dicts]
 CONFIG_BASE_NAME = "USSR_vs_MAIN"
 
 

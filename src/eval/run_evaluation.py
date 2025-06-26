@@ -24,7 +24,7 @@ def run_evaluation():
                 {{'name': system_name, 'version': system_version}} as system,
                 experiment.system_setting as system_setting,
                 list_min(runtimes) as min_runtime,
-                list_avg(runtimes[2:]) AS avg_runtime,
+                list_median(runtimes[2:]) AS avg_runtime,
                 list_median(runtimes) as median_runtime
             FROM '{runs_path}/*/*/*.json'
         );"""

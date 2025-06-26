@@ -18,13 +18,13 @@ from src.runner.experiment_runner import run
 
 
 def main():
-    sfs = [30, 70]
+    sfs = [1, 10]
     for sf in sfs:
         config: RunConfig = {
             'name': f'USSR_vs_baseline_tpch_sf{sf}',
             'run_settings': {
                 'n_parallel': 1,
-                'n_runs': 10,
+                'n_runs': 5,
             },
             'system_settings': [
                 # {'n_threads': 1},

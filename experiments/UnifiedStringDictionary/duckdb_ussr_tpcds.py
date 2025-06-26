@@ -32,7 +32,7 @@ def main():
                 # {'n_threads': 4},
                 {'n_threads': 8},
             ],
-            'systems': [DUCK_DB_USSR_no_singleton_new_api, DUCK_DB_MAIN],
+            'systems': [DUCK_DB_MAIN, USSR_SALT_CLEAN],
             'benchmarks': get_tpcds_benchmark([sf]),  # Pass as a single-element list
         }
         run(config)

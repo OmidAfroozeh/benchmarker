@@ -691,7 +691,62 @@ USSR_SALT_CLEAN: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/6dc7f81d2358fb3ad2cf593e52fa39671398dbfb'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/e0eb10075cda3183d7edd1a17c93dea2701a827d'
         },
     },
 }
+
+
+USSR_SALT_CLEAN_FLAT_VEC_JOIN: System = {
+    **DUCK_DB_MAIN,
+    'version': 'USSR_SALT_CLEAN_FLAT_VEC_JOIN',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/6e7db91eb0ed0b57ac2c1784ce74ea6f82591bc0'
+        },
+    },
+}
+
+USSR_SALT_CLEAN_FLAT_VEC_JOIN_NEW: System = {
+    **DUCK_DB_MAIN,
+    'version': 'USSR_SALT_CLEAN_FLAT_VEC_JOIN_NEW',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/56c20c556520756d07ae0de72f872f25b3e41e90'
+        },
+    },
+}
+
+Unified_String_Dictionary: System = {
+    **DUCK_DB_MAIN,
+    'version': 'Unified_String_Dictionary',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/3439c1b6e6d2bb6f4c7f3a743ea715691e100028'
+        },
+    },
+}
+
+
+Unified_String_Dictionary_256MB_All_dicts: System = {
+    **DUCK_DB_MAIN,
+    'version': 'Unified_String_Dictionary_256MB_All_dicts',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/fad23b04195823c985025b5105756ac1c94ab455'
+        },
+    },
+}
+

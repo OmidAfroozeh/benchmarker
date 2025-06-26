@@ -23,7 +23,7 @@ def main():
         'name': 'USSR_vs_baseline_clickbench',
         'run_settings': {
             'n_parallel': 1,
-            'n_runs': 12,
+            'n_runs': 6,
         },
         'system_settings': [
             {'n_threads': 8},
@@ -31,7 +31,7 @@ def main():
             # {'n_threads': 4},
             # {'n_threads': 8},
         ],
-        'systems': [DUCK_DB_MAIN, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion],
+        'systems': [DUCK_DB_MAIN, USSR_SALT_CLEAN],
         'benchmarks': get_clickbench(),
     }
     run(config)
