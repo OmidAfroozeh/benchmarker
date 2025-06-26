@@ -75,22 +75,22 @@ CUSTOM_QUERIES: List[Query] = [
     {
         "name": "double_column_groupby",
         "index": 0,
-        "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2"},
+        "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2 limit 10"},
     },
     {
         "name": "constant_double_column_groupby",
         "index": 1,
-        "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
+        "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1 limit 10"},
     },
     {
         "name": "single_column_groupby",
         "index": 2,
-        "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
+        "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1 limit 10"},
     },
     {
         "name": "triple_column_groupby",
         "index": 3,
-        "run_script": {"duckdb": "SELECT str1, str2, str3 FROM varchars GROUP BY str1, str2, str3"},
+        "run_script": {"duckdb": "SELECT str1, str2, str3 FROM varchars GROUP BY str1, str2, str3 limit 10"},
     },
 ]
 

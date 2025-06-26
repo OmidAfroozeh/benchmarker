@@ -358,9 +358,9 @@ except Exception:
 
 # Grid parameters ------------------------------------------------------------
 LengthSpec = Union[int, Tuple[int, int]]
-LENGTH_SPECS: Sequence[LengthSpec] = [32, 64]
+LENGTH_SPECS: Sequence[LengthSpec] = [32]
 TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
-N_UNIQUE_LIST: Sequence[int] = [1050]
+N_UNIQUE_LIST: Sequence[int] = [100]
 S_VALUES: Sequence[float] = [0.0]
 
 CHUNK_ROWS = 1_000_000
@@ -413,9 +413,6 @@ def make_column_specs(spec: LengthSpec, n_unique: int, s_val: float) -> List[Col
         ColumnSpec("str1", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
         ColumnSpec("str2", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
         ColumnSpec("str3", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        ColumnSpec("str4", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        ColumnSpec("str5", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        ColumnSpec("str6", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
     ]
 
 
