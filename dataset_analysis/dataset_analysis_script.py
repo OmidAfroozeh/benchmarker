@@ -146,12 +146,16 @@ def main() -> None:
         print("No DuckDB files or user tables found – nothing to write.")
         return
 
+    script_dir = Path(__file__).parent.resolve()
+    col_stats_path = script_dir / "column_statistics.csv"
+    stor_stats_path = script_dir / "storage_summary.csv"
+
     if not col_stats.empty:
-        col_stats.to_csv("column_statistics.csv", index=False)
-        print("[✓] column_statistics.csv written.")
+        col_stats.to_csv(col_stats_path, index=False)
+        print(f"[✓] {col_stats_path.name} written.")
     if not stor_stats.empty:
-        stor_stats.to_csv("storage_summary.csv", index=False)
-        print("[✓] storage_summary.csv written.")
+        stor_stats.to_csv(stor_stats_path, index=False)
+        print(f"[✓] {stor_stats_path.name} written.")
 
 
 if __name__ == "__main__":
