@@ -750,3 +750,13 @@ Unified_String_Dictionary_256MB_All_dicts: System = {
     },
 }
 
+Unified_String_Dictionary_Local: System = {
+    **DUCK_DB_MAIN,
+    'version': 'Unified_String_Dictionary_Local',
+    'build_config': {
+        'location': {
+            'location': 'local',
+            'local_path': '/Users/omid/CLionProjects/DuckDB_Omidfork'
+        },
+    },
+}

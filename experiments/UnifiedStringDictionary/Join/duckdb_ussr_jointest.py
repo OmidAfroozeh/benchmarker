@@ -359,7 +359,7 @@ except Exception:
 # Grid parameters ------------------------------------------------------------
 LengthSpec = Union[int, Tuple[int, int]]
 LENGTH_SPECS: Sequence[LengthSpec] = [32]
-TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
+TOTAL_ROWS_LIST: Sequence[int] = [10_000_000]
 N_UNIQUE_LIST: Sequence[int] = [100]
 S_VALUES: Sequence[float] = [0.0]
 
@@ -372,24 +372,17 @@ TABLE_A, TABLE_B = "varchars_a", "varchars_b"
 # Queries --------------------------------------------------------------------
 CUSTOM_QUERIES: List[Query] = [
     {
-        "name": "rowwise_join",
+        "name": "join_on_integer_keys",
         "index": 0,
         "run_script": {
             "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id;"
         },
     },
     {
-        "name": "rowwise_join",
-        "index": 2,
+        "name": "join_on_integer_keys_limited_result",
+        "index": 0,
         "run_script": {
-            "duckdb": f"select count(*) from(select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id);"
-        },
-    },
-        {
-        "name": "rowwise_join",
-        "index": 1,
-        "run_script": {
-            "duckdb": f"select count(*) from varchars_a join varchars_b on varchars_a.str1 = varchars_b.str1"
+            "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id limit 10;"
         },
     },
 ]

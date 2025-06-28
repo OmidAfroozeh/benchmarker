@@ -205,7 +205,8 @@ def generate_string_benchmark(
         logger.info("Using seed = %d", seed)
 
     if alphabet is None:
-        alphabet = np.array(list(_string.ascii_lowercase), dtype="U1")
+        # alphabet = np.array(list(_string.ascii_lowercase), dtype="U1")
+        alphabet = np.array(list(_string.ascii_letters + _string.digits + _string.punctuation), dtype="U1")
 
     # pools --------------------------------------------------------------
     used: Set[str] = set()

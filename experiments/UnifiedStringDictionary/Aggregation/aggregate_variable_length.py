@@ -31,7 +31,7 @@ from config.systems.duckdb import (
     UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,
     USSR_SALT_CLEAN,
     USSR_SALT_CLEAN_FLAT_VEC_JOIN_NEW,
-    Unified_String_Dictionary
+    Unified_String_Dictionary,
 )
 from src.models import DataSet, Benchmark, RunConfig, Query
 from src.runner.experiment_runner import run
@@ -48,7 +48,7 @@ from src.utils import get_data_path  # type: ignore
 LengthSpec = Union[int, Tuple[int, int]]  # fixed or (min, max)
 
 # default grids
-LENGTH_SPECS: Sequence[LengthSpec] = [8, 16, 32, 64, 128, 255, 512, (8,120)]
+LENGTH_SPECS: Sequence[LengthSpec] = [8, 16, 32, 64, 128, 255, (8, 120), (16, 32), (16, 64)]
 TOTAL_ROWS_LIST: Sequence[int] = [10_000_000]
 N_UNIQUE_LIST: Sequence[int] = [100]
 S_VALUES: Sequence[float] = [0.0]
@@ -59,7 +59,7 @@ S_VALUES: Sequence[float] = [0.0]
 # Which variable to pin (only n_unique supported in this example)
 PIN_VAR = 'n_unique'
 # Values for the pinned variable; e.g., run benchmarks for these unique counts
-PIN_VALUES: Sequence[int] = [100]
+PIN_VALUES: Sequence[int] = [100, 500, 1000]
 
 # ---------------------------------------------------------------------------
 # Fixed generation knobs

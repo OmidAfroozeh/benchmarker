@@ -80,11 +80,11 @@ CUSTOM_QUERIES: List[Query] = [
         "index": 1,
         "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
     },
-    # {
-    #     "name": "single_column_groupby",
-    #     "index": 2,
-    #     "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
-    # },
+    {
+        "name": "single_column_groupby",
+        "index": 2,
+        "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
+    },
 ]
 
 
