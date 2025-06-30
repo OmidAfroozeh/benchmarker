@@ -731,7 +731,7 @@ Unified_String_Dictionary: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/3439c1b6e6d2bb6f4c7f3a743ea715691e100028'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/246c2b9edb8404c99238c9f8433592dbe8183a6f'
         },
     },
 }
@@ -746,17 +746,6 @@ Unified_String_Dictionary_256MB_All_dicts: System = {
         'location': {
             'location': 'github',
             'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/fad23b04195823c985025b5105756ac1c94ab455'
-        },
-    },
-}
-
-Unified_String_Dictionary_Local: System = {
-    **DUCK_DB_MAIN,
-    'version': 'Unified_String_Dictionary_Local',
-    'build_config': {
-        'location': {
-            'location': 'local',
-            'local_path': '/Users/omid/CLionProjects/DuckDB_Omidfork'
         },
     },
 }

@@ -16,15 +16,7 @@ TPC_H_QUERIES: List[Query] = [
         'run_script': {
             "duckdb": f"PRAGMA tpch({i + 1});",
         }
-    } for i in range(22)
-] + [
-    {
-        'name': 'tpch_varchar_test',
-        'index': 23,
-        'run_script': {
-            "duckdb": "SELECT count(*) FROM nation JOIN customer ON nation.n_nation_uuid_str = customer.n_nation_uuid_str;",
-        }
-    }
+    } for i in range(0)
 ]
 
 

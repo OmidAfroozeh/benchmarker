@@ -24,7 +24,7 @@ def main():
             'name': f'USSR_vs_baseline_tpch_sf{sf}',
             'run_settings': {
                 'n_parallel': 1,
-                'n_runs': 5,
+                'n_runs': 6,
             },
             'system_settings': [
                 # {'n_threads': 1},

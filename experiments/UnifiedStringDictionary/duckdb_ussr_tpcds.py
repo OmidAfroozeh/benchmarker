@@ -12,7 +12,7 @@ great_grandparent = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(great_grandparent))
 
 from config.benchmark.tpcds import get_tpcds_benchmark
-from config.systems.duckdb import DUCK_DB_USSR_no_singleton_new_api, DUCK_DB_MAIN
+from config.systems.duckdb import Unified_String_Dictionary, DUCK_DB_USSR_no_singleton_new_api, DUCK_DB_MAIN
 from src.models import RunConfig
 from src.runner.experiment_runner import run
 
@@ -24,7 +24,7 @@ def main():
             'name': f'USSR_vs_baseline_tpcds_sf{sf}',
             'run_settings': {
                 'n_parallel': 5,
-                'n_runs': 5,
+                'n_runs': 6,
             },
             'system_settings': [
                 # {'n_threads': 1},
@@ -32,7 +32,7 @@ def main():
                 # {'n_threads': 4},
                 {'n_threads': 8},
             ],
-            'systems': [DUCK_DB_MAIN, USSR_SALT_CLEAN],
+            'systems': [DUCK_DB_MAIN, Unified_String_Dictionary],
             'benchmarks': get_tpcds_benchmark([sf]),  # Pass as a single-element list
         }
         run(config)
