@@ -18,17 +18,17 @@ TPC_H_QUERIES: List[Query] = [
     #     }
     # } for i in range(22)
     {
-        'name': f'tpch{16}',
-        'index': 16,
+        'name': f'tpch_varchar_test_count_star',
+        'index': 0,
         'run_script': {
-            "duckdb": f"PRAGMA tpch({16});",
+            "duckdb": f"select count(*) from nation JOIN customer  on nation.n_nation_uuid_str = customer.n_nation_uuid_str;",
         }
     },
     {
-        'name': f'tpch_varchar_test',
-        'index': 30,
+        'name': f'tpch_varchar_test_star',
+        'index': 1,
         'run_script': {
-            "duckdb": f"select count(*) from nation JOIN customer  on nation.n_nation_uuid_str = customer.n_nation_uuid_str;",
+            "duckdb": f"select * from nation JOIN customer  on nation.n_nation_uuid_str = customer.n_nation_uuid_str;",
         }
     }
 ]

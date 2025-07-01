@@ -16,7 +16,7 @@ TPC_H_QUERIES: List[Query] = [
         'run_script': {
             "duckdb": f"PRAGMA tpch({i + 1});",
         }
-    } for i in range(0)
+    } for i in range(22)
 ]
 
 

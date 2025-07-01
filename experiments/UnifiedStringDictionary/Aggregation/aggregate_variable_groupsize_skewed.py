@@ -79,12 +79,7 @@ CUSTOM_QUERIES: List[Query] = [
         "name": "constant_double_column_groupby",
         "index": 1,
         "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
-    },
-    {
-        "name": "single_column_groupby",
-        "index": 2,
-        "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
-    },
+    }
 ]
 
 
@@ -170,7 +165,7 @@ def build_benchmark(s_values_list: Sequence[float] = DEFAULT_S_VALUES) -> Benchm
 # =============================================================================
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary_256MB_All_dicts]
+SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary, Unified_String_Dictionary_256MB_All_dicts]
 CONFIG_BASE_NAME = "USSR_vs_MAIN"
 
 
