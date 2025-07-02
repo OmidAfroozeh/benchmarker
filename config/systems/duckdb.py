@@ -731,7 +731,7 @@ Unified_String_Dictionary: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/246c2b9edb8404c99238c9f8433592dbe8183a6f'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/def47f198f42e709acb9a51cd3dc57e0d61d5f72'
         },
     },
 }

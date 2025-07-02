@@ -165,7 +165,7 @@ def build_benchmark(s_values_list: Sequence[float] = DEFAULT_S_VALUES) -> Benchm
 # =============================================================================
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary, Unified_String_Dictionary_256MB_All_dicts]
+SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary]
 CONFIG_BASE_NAME = "USSR_vs_MAIN"
 
 

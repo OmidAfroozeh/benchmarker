@@ -380,7 +380,7 @@ CUSTOM_QUERIES: List[Query] = [
     },
     {
         "name": "join_on_integer_keys_limited_result",
-        "index": 0,
+        "index": 1,
         "run_script": {
             "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id limit 10;"
         },

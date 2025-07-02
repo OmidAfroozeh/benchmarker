@@ -11,12 +11,19 @@ logger = get_logger(__name__)
 
 TPC_H_QUERIES: List[Query] = [
     {
-        'name': f'tpch{i + 1}',
-        'index': i,
+        'name': f'tpch{16}',
+        'index': 16,
         'run_script': {
-            "duckdb": f"PRAGMA tpch({i + 1});",
+            "duckdb": f"PRAGMA tpch(16);",
         }
-    } for i in range(22)
+    },
+                       {
+                           'name': f'tpch_varchar_test_count_star',
+                           'index': 0,
+                           'run_script': {
+                               "duckdb": f"select count(*) from nation JOIN customer  on nation.n_nation_uuid_str = customer.n_nation_uuid_str;",
+                           }
+                       },
 ]
 
 
