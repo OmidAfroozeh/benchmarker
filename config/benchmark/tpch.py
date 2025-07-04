@@ -19,9 +19,9 @@ TPC_H_QUERIES: List[Query] = [
     },
                        {
                            'name': f'tpch_varchar_test_count_star',
-                           'index': 0,
+                           'index': 23,
                            'run_script': {
-                               "duckdb": f"select count(*) from nation JOIN customer  on nation.n_nation_uuid_str = customer.n_nation_uuid_str;",
+                               "duckdb": f"select * from nation JOIN customer  on nation.n_nation_uuid_str = customer.n_nation_uuid_str;",
                            }
                        },
 ]
@@ -87,20 +87,22 @@ def __generate_tpch_data(sfs: List[int]):
             INSTALL tpch;
             LOAD tpch;
             CALL dbgen(sf = {sf});
-            ALTER TABLE nation ADD COLUMN n_nation_uuid UUID DEFAULT uuid();
+                    ALTER TABLE nation ADD COLUMN n_nation_uuid UUID DEFAULT uuid();
 
-            -- Step 2: Add varchar version of UUID
-            ALTER TABLE nation ADD COLUMN n_nation_uuid_str VARCHAR;
-            UPDATE nation SET n_nation_uuid_str = n_nation_uuid::VARCHAR;
+        -- Step 2: Add varchar version of UUID
+        ALTER TABLE nation ADD COLUMN n_nation_uuid_str VARCHAR;
+        UPDATE nation SET n_nation_uuid_str = n_nation_uuid::VARCHAR;
 
-            -- Step 3: Add UUID columns to referencing tables
-            ALTER TABLE customer ADD COLUMN n_nation_uuid_str VARCHAR;
+        -- Step 3: Add UUID columns to referencing tables
+        ALTER TABLE customer ADD COLUMN n_nation_uuid_str VARCHAR;
 
-            -- Step 4: Propagate UUIDs to referencing tables
-            UPDATE customer
-            SET n_nation_uuid_str = nation.n_nation_uuid_str
-            FROM nation
-            WHERE customer.c_nationkey = nation.n_nationkey;
+        -- Step 4: Propagate UUIDs to referencing tables
+        UPDATE customer
+        SET n_nation_uuid_str = nation.n_nation_uuid_str
+        FROM nation
+        WHERE customer.c_nationkey = nation.n_nationkey;
+
         """
+
         con.sql(query_tpch)
         con.close()

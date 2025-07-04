@@ -60,7 +60,7 @@ def get_duckdb_runtime_and_cardinality(thread: int) -> Optional[Tuple[float, int
 
 
 DUCK_DB_MAIN: System = {
-    'version': 'latest_build_main',
+    'version': 'main',
     'name': 'duckdb',
     'build_config': {
         'build_command': 'GEN=ninja BUILD_BENCHMARK=1 BUILD_HTTPFS=1 BUILD_TPCH=1 BUILD_PARQUET=1 BUILD_TPCDS=1 make',
@@ -725,13 +725,13 @@ USSR_SALT_CLEAN_FLAT_VEC_JOIN_NEW: System = {
 
 Unified_String_Dictionary: System = {
     **DUCK_DB_MAIN,
-    'version': 'Unified_String_Dictionary',
+    'version': 'unified_string_dictionary',
     'build_config': None,
     'build_config': {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/def47f198f42e709acb9a51cd3dc57e0d61d5f72'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/ff9720521e9d83b9eabf63801368576a71c757d8'
         },
     },
 }

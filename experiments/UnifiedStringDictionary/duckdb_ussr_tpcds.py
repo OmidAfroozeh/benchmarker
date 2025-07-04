@@ -23,7 +23,7 @@ def main():
         config: RunConfig = {
             'name': f'USSR_vs_baseline_tpcds_sf{sf}',
             'run_settings': {
-                'n_parallel': 5,
+                'n_parallel': 1,
                 'n_runs': 6,
             },
             'system_settings': [

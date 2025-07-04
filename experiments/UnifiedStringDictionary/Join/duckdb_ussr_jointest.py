@@ -1,27 +1,3 @@
-"""string_benchmark_multi_tables_driver.py – Generator *plus* two‑table benchmark driver
-================================================================================
-A single self‑contained file that provides:
-
-1. **Multi‑table string data generator** – create any number of varchar tables
-   inside one DuckDB database.
-2. **Driver** that, for every length × unique × Zipf‑s parameter combination,
-   writes *two* tables – `varchars_a` and `varchars_b` – into *one* database and
-   feeds them to your existing benchmark/runner.
-
-**New in this revision**: every generated table now contains a monotonically
-increasing **`id`** (INTEGER) column, starting at 0 and shared across all
-variant tables. This enables straightforward equi‑joins such as
-`... ON a.id = b.id`.
-
-Usage (defaults are embedded as constants at the bottom):
-```bash
-python string_benchmark_multi_tables_driver.py \
-       --root /mnt/benchmarks  # override base folder if desired
-```
-
-If the `src.*` utilities or the experiment runner aren’t available, the script
-falls back to stubs and prints a dry‑run config instead of executing.
-"""
 
 from __future__ import annotations
 
@@ -97,9 +73,6 @@ except Exception:  # pragma: no cover – standalone mode
 
 logger = get_logger(__name__)
 
-##############################################################################
-# ░░ Part 1 – Multi‑table string generator ░░                                #
-##############################################################################
 
 DistributionLiteral = Literal["uniform", "zipf"]
 
@@ -328,10 +301,6 @@ def build_db_with_multiple_tables(
         )
     return Path(duckdb_path)
 
-##############################################################################
-# ░░ Part 2 – Two‑table benchmark driver ░░                                  #
-##############################################################################
-
 # Optional repo root injection
 root_directory = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(root_directory))
@@ -404,8 +373,8 @@ def build_db_path(len_spec: LengthSpec, n_unique: int, s_val: float, root: Optio
 def make_column_specs(spec: LengthSpec, n_unique: int, s_val: float) -> List[ColumnSpec]:
     return [
         ColumnSpec("str1", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        ColumnSpec("str2", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        ColumnSpec("str3", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
+        # ColumnSpec("str2", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
+        # ColumnSpec("str3", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
     ]
 
 
