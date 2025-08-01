@@ -60,13 +60,14 @@ def get_duckdb_runtime_and_cardinality(thread: int) -> Optional[Tuple[float, int
 
 
 DUCK_DB_MAIN: System = {
-    'version': 'main',
+    'version': 'duckdb_latest_main',
     'name': 'duckdb',
     'build_config': {
         'build_command': 'GEN=ninja BUILD_BENCHMARK=1 BUILD_HTTPFS=1 BUILD_TPCH=1 BUILD_PARQUET=1 BUILD_TPCDS=1 make',
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/duckdb/duckdb',
+            # latest built as of July 8th
+            'github_url': 'https://github.com/duckdb/duckdb/commit/223ff0a7dba7900039d5910a009247ef097fff3c',
         },
     },
     'run_config': {
@@ -523,7 +524,7 @@ UnifiedStringDictionary_1MB: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/52e5a0280b885860affaf9fec3f66125d130d08a'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/6c898d0b3f3826378901748ebb4871bda2f46e88'
         },
     },
 }
@@ -536,7 +537,7 @@ UnifiedStringDictionary_2MB: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/f1fbf0cde8b7e5f8c31ae7a59abf21ca68de02ee'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/tree/UnifiedStringDictionary-2MB'
         },
     },
 }
@@ -549,7 +550,7 @@ UnifiedStringDictionary_4MB: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/a493c2ea44d37141fb677ffd07ab112e18de9015'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/tree/UnifiedStringDictionary-4MB'
         },
     },
 }
@@ -562,7 +563,7 @@ UnifiedStringDictionary_8MB: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/bd9f8d6a6d7b36cc59bc8068aac463c4bccdb077'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/tree/UnifiedStringDictionary-8MB'
         },
     },
 }
@@ -574,7 +575,7 @@ UnifiedStringDictionary_16MB: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/61d87a42aafb23759cc502317f0b78c028f7ef54'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/01bfcec016de40dc93fcf8233070aeabea54653a'
         },
     },
 }
@@ -659,7 +660,7 @@ UnifiedStringDictionary_initial_benchmark_32MB_upper_limit: System = {
 
 UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion: System = {
     **DUCK_DB_MAIN,
-    'version': 'UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion',
+    'version': 'unified_string_dictionary_sampling_32MB',
     'build_config': None,
     'build_config': {
         **DUCK_DB_MAIN['build_config'],
@@ -731,21 +732,47 @@ Unified_String_Dictionary: System = {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/ff9720521e9d83b9eabf63801368576a71c757d8'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/c7804077a2c9e20e984482da58d0d0f378f52d32'
         },
     },
 }
 
 
-Unified_String_Dictionary_256MB_All_dicts: System = {
+unified_string_dictionary_256MB_no_constraint: System = {
     **DUCK_DB_MAIN,
-    'version': 'Unified_String_Dictionary_256MB_All_dicts',
+    'version': 'unified_string_dictionary_256MB',
     'build_config': None,
     'build_config': {
         **DUCK_DB_MAIN['build_config'],
         'location': {
             'location': 'github',
-            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/fad23b04195823c985025b5105756ac1c94ab455'
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/9941cbcc5596197e762ea0b49ceba36b5b94ab4b'
+        },
+    },
+}
+
+unified_string_dictionary_256MB_with_constraint: System = {
+    **DUCK_DB_MAIN,
+    'version': 'unified_string_dictionary_256MB_constraint',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/commit/11b2a2014a28e6746865815d9e00ab314af177d5'
+        },
+    },
+}
+
+unified_string_dictionary_sort_test: System = {
+    **DUCK_DB_MAIN,
+    'version': 'unified_string_dictionary_sort_test',
+    'build_config': None,
+    'build_config': {
+        **DUCK_DB_MAIN['build_config'],
+        'location': {
+            'location': 'github',
+            'github_url': 'https://github.com/OmidAfroozeh/duckdb/tree/refs/heads/USD_sort_test'
         },
     },
 }

@@ -10,6 +10,13 @@ from src.utils import get_data_path, pad
 logger = get_logger(__name__)
 
 TPC_H_QUERIES: List[Query] = [
+    # {
+    #     'name': f'tpch{i + 1}',
+    #     'index': i,
+    #     'run_script': {
+    #         "duckdb": f"PRAGMA tpch({i + 1});",
+    #     }
+    # } for i in range(22)
     {
         'name': f'tpch{16}',
         'index': 16,
@@ -18,7 +25,7 @@ TPC_H_QUERIES: List[Query] = [
         }
     },
                        {
-                           'name': f'tpch_varchar_test_count_star',
+                           'name': f'tpch_varchar_test',
                            'index': 23,
                            'run_script': {
                                "duckdb": f"select * from nation JOIN customer  on nation.n_nation_uuid_str = customer.n_nation_uuid_str;",

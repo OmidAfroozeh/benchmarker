@@ -9,12 +9,635 @@ from src.utils import get_data_path, pad
 
 logger = get_logger(__name__)
 
-TPC_DS_QUERIES: List[Query] = [
-    {
-        'name': f'comgov-{i + 1}',
-        'index': i,
-        'run_script': {
-            "duckdb": f"PRAGMA tpcds({i + 1});",
-        }
-    } for i in range(99)
+COMMON_GOVERNMENT_QUERIES = [
+  #   {'index': 1,
+  # 'name': 'q1',
+  # 'run_script': {'duckdb': 'SELECT "CommonGovernment_1"."ag_name" AS "ag_name" '
+  #                          'FROM "CommonGovernment_1" GROUP BY '
+  #                          '"CommonGovernment_1"."ag_name" ORDER BY "ag_name" '
+  #                          'ASC ;'}},
+ {'index': 2,
+  'name': 'q2',
+  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."ag_name" AS '
+                           '"ag_name",   '
+                           '"CommonGovernment_13"."funding_agency_name" AS '
+                           '"funding_agency_name",   '
+                           '"CommonGovernment_13"."level1_category" AS '
+                           '"level1_category",   CAST(EXTRACT(YEAR FROM '
+                           '(cast("CommonGovernment_13"."signeddate" as DATE) '
+                           "+ 3 * INTERVAL '1' MONTH)) AS BIGINT) AS "
+                           '"yr:signeddate:ok" FROM "CommonGovernment_13" '
+                           'GROUP BY "CommonGovernment_13"."ag_name",   '
+                           '"CommonGovernment_13"."funding_agency_name",   '
+                           '"CommonGovernment_13"."level1_category",   '
+                           '"yr:signeddate:ok";'}},
+ {'index': 3,
+  'name': 'q3',
+  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."award_type" AS '
+                           '"award_type",   '
+                           '"CommonGovernment_13"."level1_category" AS '
+                           '"level1_category",   '
+                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+                           '"sum:obligatedamount:ok" FROM '
+                           '"CommonGovernment_13" GROUP BY '
+                           '"CommonGovernment_13"."award_type",   '
+                           '"CommonGovernment_13"."level1_category";'}},
+ # {'index': 4,
+ #  'name': 'q4',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."funding_agency_name" '
+ #                           'AS "funding_agency_name" FROM '
+ #                           '"CommonGovernment_13" GROUP BY '
+ #                           '"CommonGovernment_13"."funding_agency_name" ORDER '
+ #                           'BY "funding_agency_name" ASC ;'}},
+ # {'index': 5,
+ #  'name': 'q5',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."level1_category" AS '
+ #                           '"level1_category",   '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM '
+ #                           '"CommonGovernment_13" GROUP BY '
+ #                           '"CommonGovernment_13"."level1_category";'}},
+ {'index': 6,
+  'name': 'q6',
+  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."naics_code" AS '
+                           '"naics_code",   "CommonGovernment_13"."naics_name" '
+                           'AS "naics_name",   '
+                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+                           '"sum:obligatedamount:ok" FROM '
+                           '"CommonGovernment_13" GROUP BY '
+                           '"CommonGovernment_13"."naics_code",   '
+                           '"CommonGovernment_13"."naics_name";'}},
+ {'index': 7,
+  'name': 'q7',
+  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."naics_name" AS '
+                           '"naics_name",   '
+                           '"CommonGovernment_13"."prod_or_serv_code_desc" AS '
+                           '"prod_or_serv_code_desc",   '
+                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+                           '"sum:obligatedamount:ok",   '
+                           '"CommonGovernment_13"."vend_vendorname" AS '
+                           '"vend_vendorname" FROM "CommonGovernment_13" GROUP '
+                           'BY "CommonGovernment_13"."naics_name",   '
+                           '"CommonGovernment_13"."prod_or_serv_code_desc", '
+                           '"CommonGovernment_13"."vend_vendorname";'}},
+ {'index': 8,
+  'name': 'q8',
+  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."prod_or_serv_code" '
+                           'AS "prod_or_serv_code",   '
+                           '"CommonGovernment_13"."prod_or_serv_code_desc" AS '
+                           '"prod_or_serv_code_desc",   '
+                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+                           '"sum:obligatedamount:ok" FROM '
+                           '"CommonGovernment_13" GROUP BY '
+                           '"CommonGovernment_13"."prod_or_serv_code",   '
+                           '"CommonGovernment_13"."prod_or_serv_code_desc";'}},
+ # {'index': 9,
+ #  'name': 'q9',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."vend_vendorname" AS '
+ #                           '"vend_vendorname" FROM "CommonGovernment_13" GROUP '
+ #                           'BY "CommonGovernment_13"."vend_vendorname" ORDER '
+ #                           'BY "vend_vendorname" ASC ;'}},
+ # {'index': 10,
+ #  'name': 'q10',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_13"."whocanuse" AS '
+ #                           '"whocanuse" FROM "CommonGovernment_13" GROUP BY '
+ #                           '"CommonGovernment_13"."whocanuse" ORDER BY '
+ #                           '"whocanuse" ASC ;'}},
+ # {'index': 11,
+ #  'name': 'q11',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_3"."bureau_name" AS '
+ #                           '"bureau_name" FROM "CommonGovernment_3" GROUP BY '
+ #                           '"CommonGovernment_3"."bureau_name";'}},
+ # {'index': 12,
+ #  'name': 'q12',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_3"."co_name" AS "co_name" '
+ #                           'FROM "CommonGovernment_3" GROUP BY '
+ #                           '"CommonGovernment_3"."co_name";'}},
+ # {'index': 13,
+ #  'name': 'q13',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_3"."funding_agency_name" '
+ #                           'AS "funding_agency_name" FROM "CommonGovernment_3" '
+ #                           'GROUP BY '
+ #                           '"CommonGovernment_3"."funding_agency_name";'}},
+ # {'index': 14,
+ #  'name': 'q14',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_4"."ag_name" AS "ag_name" '
+ #                           'FROM "CommonGovernment_4" GROUP BY '
+ #                           '"CommonGovernment_4"."ag_name" ORDER BY "ag_name" '
+ #                           'ASC ;'}},
+ # {'index': 15,
+ #  'name': 'q15',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_4"."bureau_name" AS '
+ #                           '"bureau_name" FROM "CommonGovernment_4" GROUP BY '
+ #                           '"CommonGovernment_4"."bureau_name";'}},
+ # {'index': 16,
+ #  'name': 'q16',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_4"."level2_category" AS '
+ #                           '"Level2 Category (copy)" FROM "CommonGovernment_4" '
+ #                           'GROUP BY "CommonGovernment_4"."level2_category";'}},
+ # {'index': 17,
+ #  'name': 'q17',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_5"."funding_agency_name" '
+ #                           'AS "funding_agency_name" FROM "CommonGovernment_5" '
+ #                           'GROUP BY '
+ #                           '"CommonGovernment_5"."funding_agency_name";'}},
+ # {'index': 18,
+ #  'name': 'q18',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_6"."level2_category" AS '
+ #                           '"Level2 Category (copy)" FROM "CommonGovernment_6" '
+ #                           'GROUP BY "CommonGovernment_6"."level2_category";'}},
+ # {'index': 19,
+ #  'name': 'q19',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_7"."co_name" AS "co_name" '
+ #                           'FROM "CommonGovernment_7" GROUP BY '
+ #                           '"CommonGovernment_7"."co_name";'}},
+ # {'index': 20,
+ #  'name': 'q20',
+ #  'run_script': {'duckdb': 'SELECT "CommonGovernment_9"."level1_category" AS '
+ #                           '"level1_category",   '
+ #                           'SUM("CommonGovernment_9"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM "CommonGovernment_9" '
+ #                           'GROUP BY "CommonGovernment_9"."level1_category";'}},
+ {'index': 21,
+  'name': 'q21',
+  'run_script': {'duckdb': 'SELECT (CASE WHEN '
+                           '("CommonGovernment_13"."refidvid_piid" IS NULL) '
+                           'THEN null WHEN '
+                           '("CommonGovernment_13"."refidvid_piid" = \' \') '
+                           'THEN null ELSE '
+                           '"CommonGovernment_13"."refidvid_piid" END) AS '
+                           '"Refidvid Piid (group)",   '
+                           '"CommonGovernment_13"."award_type" AS '
+                           '"award_type",   '
+                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+                           '"sum:obligatedamount:ok" FROM '
+                           '"CommonGovernment_13" GROUP BY "Refidvid Piid '
+                           '(group)",   "CommonGovernment_13"."award_type";'}},
+ # {'index': 22,
+ #  'name': 'q22',
+ #  'run_script': {'duckdb': 'SELECT CAST(EXTRACT(YEAR FROM '
+ #                           '(cast("CommonGovernment_2"."signeddate" as DATE) + '
+ #                           "3 * INTERVAL '1' MONTH)) AS BIGINT) AS "
+ #                           '"yr:signeddate:ok" FROM "CommonGovernment_2" GROUP '
+ #                           'BY "yr:signeddate:ok";'}},
+ # {'index': 23,
+ #  'name': 'q23',
+ #  'run_script': {'duckdb': 'SELECT CAST(EXTRACT(YEAR FROM '
+ #                           '(cast("CommonGovernment_4"."signeddate" as DATE) + '
+ #                           "3 * INTERVAL '1' MONTH)) AS BIGINT) AS "
+ #                           '"yr:signeddate:ok" FROM "CommonGovernment_4" GROUP '
+ #                           'BY "yr:signeddate:ok";'}},
+ # {'index': 26,
+ #  'name': 'q26',
+ #  'run_script': {'duckdb': 'SELECT COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."ag_name") AS '
+ #                           '"ctd:ag_name:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."bureau_name") AS '
+ #                           '"ctd:bureau_name:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."co_name") AS '
+ #                           '"ctd:co_name:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."funding_agency_name") AS '
+ #                           '"ctd:funding_agency_name:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."naics_code") AS '
+ #                           '"ctd:naics_code:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."prod_or_serv_code") AS '
+ #                           '"ctd:prod_or_serv_code:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."refidvid_piid") AS '
+ #                           '"ctd:refidvid_piid:ok",   '
+ #                           'SUM(CAST("CommonGovernment_13"."Number of Records" '
+ #                           'AS BIGINT)) AS "sum:Number of Records:ok",   '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM '
+ #                           '"CommonGovernment_13" HAVING (COUNT(1) > 0);'}},
+ # {'index': 27,
+ #  'name': 'q27',
+ #  'run_script': {'duckdb': 'SELECT COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."refidvid_piid") AS '
+ #                           '"ctd:refidvid_piid:ok",   '
+ #                           '"CommonGovernment_13"."funding_agency_name" AS '
+ #                           '"funding_agency_name",   '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM '
+ #                           '"CommonGovernment_13" GROUP BY '
+ #                           '"CommonGovernment_13"."funding_agency_name";'}},
+ # {'index': 28,
+ #  'name': 'q28',
+ #  'run_script': {'duckdb': 'SELECT COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."refidvid_piid") AS '
+ #                           '"ctd:refidvid_piid:ok",   '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM '
+ #                           '"CommonGovernment_13" HAVING (COUNT(1) > 0);'}},
+ # {'index': 29,
+ #  'name': 'q29',
+ #  'run_script': {'duckdb': 'SELECT COUNT(DISTINCT '
+ #                           '"CommonGovernment_13"."refidvid_piid") AS '
+ #                           '"ctd:refidvid_piid:ok",   '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok",   '
+ #                           '"CommonGovernment_13"."vend_dunsnumber" AS '
+ #                           '"vend_dunsnumber" FROM "CommonGovernment_13" GROUP '
+ #                           'BY "CommonGovernment_13"."vend_dunsnumber";'}},
+ {'index': 30,
+  'name': 'q30',
+  'run_script': {'duckdb': 'SELECT COUNT(DISTINCT '
+                           '"CommonGovernment_13"."refidvid_piid") AS '
+                           '"ctd:refidvid_piid:ok",   '
+                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+                           '"sum:obligatedamount:ok",   '
+                           '"CommonGovernment_13"."vend_dunsnumber" AS '
+                           '"vend_dunsnumber",   '
+                           '"CommonGovernment_13"."vend_vendorname" AS '
+                           '"vend_vendorname" FROM "CommonGovernment_13" GROUP '
+                           'BY "CommonGovernment_13"."vend_dunsnumber",   '
+                           '"CommonGovernment_13"."vend_vendorname";'}},
+ # {'index': 31,
+ #  'name': 'q31',
+ #  'run_script': {'duckdb': 'SELECT COUNT(DISTINCT '
+ #                           '"CommonGovernment_4"."ag_name") AS '
+ #                           '"ctd:ag_name:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_4"."bureau_name") AS '
+ #                           '"ctd:bureau_name:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_4"."co_name") AS '
+ #                           '"ctd:co_name:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_4"."funding_agency_name") AS '
+ #                           '"ctd:funding_agency_name:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_4"."naics_code") AS '
+ #                           '"ctd:naics_code:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_4"."prod_or_serv_code") AS '
+ #                           '"ctd:prod_or_serv_code:ok",   COUNT(DISTINCT '
+ #                           '"CommonGovernment_4"."refidvid_piid") AS '
+ #                           '"ctd:refidvid_piid:ok",   '
+ #                           'SUM(CAST("CommonGovernment_4"."Number of Records" '
+ #                           'AS BIGINT)) AS "sum:Number of Records:ok",   '
+ #                           'SUM("CommonGovernment_4"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM "CommonGovernment_4" '
+ #                           'HAVING (COUNT(1) > 0);'}},
+ # {'index': 32,
+ #  'name': 'q32',
+ #  'run_script': {'duckdb': 'SELECT '
+ #                           'MIN("CommonGovernment_11"."prod_or_serv_code_desc") '
+ #                           'AS '
+ #                           '"TEMP(attr:prod_or_serv_code_desc:nk)(1045243469)(0)",   '
+ #                           'MAX("CommonGovernment_11"."prod_or_serv_code_desc") '
+ #                           'AS '
+ #                           '"TEMP(attr:prod_or_serv_code_desc:nk)(3611030138)(0)",   '
+ #                           '"CommonGovernment_11"."prod_or_serv_code" AS '
+ #                           '"prod_or_serv_code",   '
+ #                           'SUM(CAST("CommonGovernment_11"."Number of Records" '
+ #                           'AS BIGINT)) AS "sum:Number of Records:ok",   '
+ #                           'SUM("CommonGovernment_11"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM '
+ #                           '"CommonGovernment_11" GROUP BY '
+ #                           '"CommonGovernment_11"."prod_or_serv_code";'}},
+ # {'index': 33,
+ #  'name': 'q33',
+ #  'run_script': {'duckdb': 'SELECT MIN("CommonGovernment_13"."naics_name") AS '
+ #                           '"TEMP(attr:naics_name:nk)(3709532549)(0)",   '
+ #                           'MAX("CommonGovernment_13"."naics_name") AS '
+ #                           '"TEMP(attr:naics_name:nk)(766450649)(0)",   '
+ #                           '"CommonGovernment_13"."naics_code" AS '
+ #                           '"naics_code",   '
+ #                           'SUM(CAST("CommonGovernment_13"."Number of Records" '
+ #                           'AS BIGINT)) AS "sum:Number of Records:ok",   '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM '
+ #                           '"CommonGovernment_13" GROUP BY '
+ #                           '"CommonGovernment_13"."naics_code";'}},
+ # {'index': 34,
+ #  'name': 'q34',
+ #  'run_script': {'duckdb': 'SELECT '
+ #                           'MIN("CommonGovernment_13"."prod_or_serv_code_desc") '
+ #                           'AS '
+ #                           '"TEMP(attr:prod_or_serv_code_desc:nk)(1045243469)(0)",   '
+ #                           'MAX("CommonGovernment_13"."prod_or_serv_code_desc") '
+ #                           'AS '
+ #                           '"TEMP(attr:prod_or_serv_code_desc:nk)(3611030138)(0)",   '
+ #                           '"CommonGovernment_13"."prod_or_serv_code" AS '
+ #                           '"prod_or_serv_code",   '
+ #                           'SUM(CAST("CommonGovernment_13"."Number of Records" '
+ #                           'AS BIGINT)) AS "sum:Number of Records:ok",   '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM '
+ #                           '"CommonGovernment_13" GROUP BY '
+ #                           '"CommonGovernment_13"."prod_or_serv_code";'}},
+ # {'index': 35,
+ #  'name': 'q35',
+ #  'run_script': {'duckdb': 'SELECT MIN("CommonGovernment_8"."naics_name") AS '
+ #                           '"TEMP(attr:naics_name:nk)(3709532549)(0)",   '
+ #                           'MAX("CommonGovernment_8"."naics_name") AS '
+ #                           '"TEMP(attr:naics_name:nk)(766450649)(0)",   '
+ #                           '"CommonGovernment_8"."naics_code" AS '
+ #                           '"naics_code",   '
+ #                           'SUM(CAST("CommonGovernment_8"."Number of Records" '
+ #                           'AS BIGINT)) AS "sum:Number of Records:ok",   '
+ #                           'SUM("CommonGovernment_8"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok" FROM "CommonGovernment_8" '
+ #                           'GROUP BY "CommonGovernment_8"."naics_code";'}},
+ # {'index': 38,
+ #  'name': 'q38',
+ #  'run_script': {'duckdb': 'SELECT '
+ #                           'SUM("CommonGovernment_12"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok",   '
+ #                           '"CommonGovernment_12"."vend_contoffbussizedeterm" '
+ #                           'AS "vend_contoffbussizedeterm" FROM '
+ #                           '"CommonGovernment_12" GROUP BY '
+ #                           '"CommonGovernment_12"."vend_contoffbussizedeterm";'}},
+ # {'index': 39,
+ #  'name': 'q39',
+ #  'run_script': {'duckdb': 'SELECT '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"TEMP(% Facilities & Construction Obligated '
+ #                           'Dollars (copy))(2010885640)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = \'IT\') '
+ #                           'THEN "CommonGovernment_13"."obligatedamount" ELSE '
+ #                           'null END)) AS "TEMP(% Facilities & Construction '
+ #                           'Obligated Dollars (copy))(3650947972)(0)",   '
+ #                           'SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = '
+ #                           "'FACILITIES & CONSTRUCTION') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Human Capital Obligated Dollars '
+ #                           '(copy))(1925481089)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = '
+ #                           "'MEDICAL') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% IT Obligated Dollars '
+ #                           '(copy))(786678657)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = '
+ #                           "'OFFICE MANAGEMENT') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Medical Obligated Dollars '
+ #                           '(copy))(179574138)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = '
+ #                           "'PROFESSIONAL SERVICES') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Office Management Obligated '
+ #                           'Dollars (copy))(1238880864)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = \'HUMAN '
+ #                           "CAPITAL') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '2))(3860143998)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = '
+ #                           "'INDUSTRIAL PRODUCTS & SERVICES') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '3))(1043823838)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = '
+ #                           "'SECURITY AND PROTECTION') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '7))(1033432870)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = '
+ #                           "'TRANSPORTATION AND LOGISTICS SERVICES') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '8))(3619796678)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_13"."level1_category" = '
+ #                           "'TRAVEL & LODGING') THEN "
+ #                           '"CommonGovernment_13"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '9))(1255833575)(0)",   '
+ #                           '"CommonGovernment_13"."co_state" AS "co_state" '
+ #                           'FROM "CommonGovernment_13" GROUP BY '
+ #                           '"CommonGovernment_13"."co_state";'}},
+ # {'index': 40,
+ #  'name': 'q40',
+ #  'run_script': {'duckdb': 'SELECT '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok",   '
+ #                           '"CommonGovernment_13"."vend_contoffbussizedeterm" '
+ #                           'AS "vend_contoffbussizedeterm" FROM '
+ #                           '"CommonGovernment_13" GROUP BY '
+ #                           '"CommonGovernment_13"."vend_contoffbussizedeterm";'}},
+ # {'index': 41,
+ #  'name': 'q41',
+ #  'run_script': {'duckdb': 'SELECT '
+ #                           'SUM("CommonGovernment_13"."obligatedamount") AS '
+ #                           '"sum:obligatedamount:ok",   '
+ #                           '"CommonGovernment_13"."vend_vendorname" AS '
+ #                           '"vend_vendorname" FROM "CommonGovernment_13" GROUP '
+ #                           'BY "CommonGovernment_13"."vend_vendorname";'}},
+ # {'index': 43,
+ #  'name': 'q43',
+ #  'run_script': {'duckdb': 'SELECT SUM("CommonGovernment_4"."obligatedamount") '
+ #                           'AS "TEMP(% Facilities & Construction Obligated '
+ #                           'Dollars (copy))(2010885640)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = \'IT\') '
+ #                           'THEN "CommonGovernment_4"."obligatedamount" ELSE '
+ #                           'null END)) AS "TEMP(% Facilities & Construction '
+ #                           'Obligated Dollars (copy))(3650947972)(0)",   '
+ #                           'SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = '
+ #                           "'FACILITIES & CONSTRUCTION') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Human Capital Obligated Dollars '
+ #                           '(copy))(1925481089)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = '
+ #                           "'MEDICAL') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% IT Obligated Dollars '
+ #                           '(copy))(786678657)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = \'OFFICE '
+ #                           "MANAGEMENT') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Medical Obligated Dollars '
+ #                           '(copy))(179574138)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = '
+ #                           "'PROFESSIONAL SERVICES') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Office Management Obligated '
+ #                           'Dollars (copy))(1238880864)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = \'HUMAN '
+ #                           "CAPITAL') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '2))(3860143998)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = '
+ #                           "'INDUSTRIAL PRODUCTS & SERVICES') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '3))(1043823838)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = '
+ #                           "'SECURITY AND PROTECTION') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '7))(1033432870)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = '
+ #                           "'TRANSPORTATION AND LOGISTICS SERVICES') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '8))(3619796678)(0)",   SUM((CASE WHEN '
+ #                           '("CommonGovernment_4"."level1_category" = \'TRAVEL '
+ #                           "& LODGING') THEN "
+ #                           '"CommonGovernment_4"."obligatedamount" ELSE null '
+ #                           'END)) AS "TEMP(% Professional Services Bars (copy '
+ #                           '9))(1255833575)(0)",   '
+ #                           '"CommonGovernment_4"."co_state" AS "co_state" FROM '
+ #                           '"CommonGovernment_4" GROUP BY '
+ #                           '"CommonGovernment_4"."co_state";'}}
 ]
+def get_commongovernment() -> Benchmark:
+
+    datasets: List[DataSet] = __generate_and_return_commongoverment()
+
+
+    queries = COMMON_GOVERNMENT_QUERIES
+
+    return {
+        'name': 'commongovernment',
+        'datasets': datasets,
+        'queries': queries
+    }
+
+
+def __get_clickbench_file_path() -> str:
+    file_name =  os.path.join('commongovernment', f'commongov_1.db')
+    return get_data_path(file_name)
+
+
+def __generate_and_return_commongoverment() -> List[DataSet]:
+    __generate_clickbenchdataset()
+
+    datasets: List[DataSet] = []
+
+    duckdb_file_path = __get_clickbench_file_path()
+    duckdb_file_name_without_extension = os.path.splitext(os.path.basename(duckdb_file_path))[0]
+    setup_script = {
+        'duckdb': f"ATTACH '{duckdb_file_path}' (READ_ONLY); USE '{duckdb_file_name_without_extension}';"
+    }
+
+    dataset: DataSet = {
+        'name': f'clickbench-hits',
+        'setup_script': setup_script,
+        'config': {
+        }
+    }
+
+    datasets.append(dataset)
+
+    return datasets
+
+
+def __generate_clickbenchdataset():
+    import os
+    import urllib.request
+    import bz2
+    import shutil
+    import duckdb
+
+    logger.info('Downloading CommonGovernment datasets')
+    duckdb_file_path = __get_clickbench_file_path()
+
+    # Skip if DuckDB file already exists
+    if os.path.exists(duckdb_file_path):
+        logger.info(f'File {duckdb_file_path} already exists, skipping generation.')
+        return
+
+    # Download, decompress, load each of the 13 CSVs
+    base_url = 'http://event.cwi.nl/da/PublicBIbenchmark/CommonGovernment'
+    con = duckdb.connect(duckdb_file_path)
+
+    for i in range(1, 14):
+        bz2_filename = f'CommonGovernment_{i}.csv.bz2'
+        csv_filename = bz2_filename.replace('.bz2', '')
+        url = f'{base_url}/{bz2_filename}'
+        bz2_path = os.path.join(os.getcwd(), bz2_filename)
+        csv_path = os.path.join(os.getcwd(), csv_filename)
+
+        # Download
+        logger.info(f'Downloading {url}')
+        urllib.request.urlretrieve(url, bz2_path)
+
+        # Decompress
+        logger.info(f'Decompressing {bz2_path} to {csv_path}')
+        with bz2.open(bz2_path, 'rt') as fr, open(csv_path, 'wt') as fw:
+            shutil.copyfileobj(fr, fw)
+
+        # Create table
+        table_name = f'CommonGovernment_{i}'
+        logger.info(f'Creating table "{table_name}"')
+        con.execute(f"""
+            CREATE TABLE "{table_name}" (
+              "Number of Records" SMALLINT NOT NULL,
+              "a_aid_acontid_agencyid" VARCHAR(4) NOT NULL,
+              "a_aid_acontid_piid" VARCHAR(50) NOT NULL,
+              "ag_name" VARCHAR(50) NOT NULL,
+              "agency_code" VARCHAR(2) NOT NULL,
+              "ase_rowid" INTEGER NOT NULL,
+              "award_type" VARCHAR(21) NOT NULL,
+              "award_type_code" VARCHAR(1) NOT NULL,
+              "award_type_key" SMALLINT NOT NULL,
+              "baseandalloptionsvalue" DOUBLE PRECISION NOT NULL,
+              "baseandexercisedoptionsvalue" DOUBLE PRECISION NOT NULL,
+              "bureau_code" VARCHAR(2) NOT NULL,
+              "bureau_name" VARCHAR(40) NOT NULL,
+              "cd_contactiontype" VARCHAR(1),
+              "co_name" VARCHAR(44),
+              "co_state" VARCHAR(2),
+              "code" VARCHAR(2) NOT NULL,
+              "contract_num" VARCHAR(50),
+              "contract_signeddate" VARCHAR(20) NOT NULL,
+              "contractingofficeagencyid" VARCHAR(4) NOT NULL,
+              "count_fetched" INTEGER NOT NULL,
+              "count_total" INTEGER NOT NULL,
+              "description" VARCHAR(40) NOT NULL,
+              "fk_epa_des_prod" SMALLINT,
+              "fk_rec_mat" SMALLINT,
+              "ftsdollar" DOUBLE PRECISION NOT NULL,
+              "funding_agency" VARCHAR(4),
+              "funding_agency_key" INTEGER NOT NULL,
+              "funding_agency_name" VARCHAR(40) NOT NULL,
+              "gsadollar" DOUBLE PRECISION NOT NULL,
+              "gsaotherdollar" DOUBLE PRECISION NOT NULL,
+              "gwacs" DOUBLE PRECISION NOT NULL,
+              "level1_category" VARCHAR(37) NOT NULL,
+              "level2_category" VARCHAR(57) NOT NULL,
+              "naics_code" VARCHAR(6) NOT NULL,
+              "naics_name" VARCHAR(35) NOT NULL,
+              "nongsadollar" DOUBLE PRECISION NOT NULL,
+              "obligatedamount" DOUBLE PRECISION NOT NULL,
+              "obligatedamount_1" DECIMAL(1, 0),
+              "pbsdollar" DOUBLE PRECISION NOT NULL,
+              "primary_contract_piid" VARCHAR(51) NOT NULL,
+              "prod_or_serv_code" VARCHAR(4) NOT NULL,
+              "prod_or_serv_code_desc" VARCHAR(35),
+              "psc_code" VARCHAR(4) NOT NULL,
+              "psc_code_description" VARCHAR(100) NOT NULL,
+              "psc_key" INTEGER NOT NULL,
+              "quarter" VARCHAR(1) NOT NULL,
+              "refidvid_agencyid" VARCHAR(4) NOT NULL,
+              "refidvid_piid" VARCHAR(34),
+              "short_name" VARCHAR(11) NOT NULL,
+              "signeddate" VARCHAR(19) NOT NULL,
+              "vend_contoffbussizedeterm" VARCHAR(1) NOT NULL,
+              "vend_dunsnumber" VARCHAR(9) NOT NULL,
+              "vend_vendorname" VARCHAR(108),
+              "whocanuse" VARCHAR(50),
+              "year" VARCHAR(4) NOT NULL
+            );
+        """)
+
+        # Load data
+        logger.info(f'Loading data into "{table_name}" from {csv_path}')
+        con.execute(f"""
+            COPY "{table_name}"
+            FROM '{csv_path}'
+            WITH (
+              FORMAT CSV,
+              HEADER TRUE,
+              DELIMITER '|',
+              NULLSTR 'null'
+            );
+        """)
+
+        # Clean up
+        logger.info(f'Removing temporary files for {table_name}')
+        os.remove(bz2_path)
+        os.remove(csv_path)
+
+    con.close()
+    logger.info('All CommonGovernment tables created and loaded successfully.')
+
+

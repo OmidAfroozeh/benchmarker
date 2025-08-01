@@ -32,7 +32,11 @@ from config.systems.duckdb import (
     UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,
     UnifiedStringDictionary_1GB_full_insertion,
     USSR_SALT_CLEAN,
-    Unified_String_Dictionary
+    Unified_String_Dictionary,
+    unified_string_dictionary_256MB_no_constraint,
+    UnifiedStringDictionary_16MB,
+    unified_string_dictionary_256MB_with_constraint
+
 )
 from src.models import DataSet, Benchmark, RunConfig, Query
 from src.runner.experiment_runner import run
@@ -50,11 +54,18 @@ LengthSpec = Union[int, Tuple[int, int]]  # fixed or (min, max)
 
 # default grids
 LENGTH_SPECS: Sequence[LengthSpec] = [32]
-TOTAL_ROWS_LIST: Sequence[int] = [20_000_000]
-N_UNIQUE_LIST: Sequence[int] = [100, 1000, 10000, 30000, 50000, 100_000, 250_000, 500_000, 1_000_000]
+TOTAL_ROWS_LIST: Sequence[int] = [10_000_000]
+# N_UNIQUE_LIST: Sequence[int] = [100, 1000, 3000]
+# N_UNIQUE_LIST: Sequence[int] = [100, 300, 500, 1000, 3000, 5000, 10000, 30000, 50000, 100_000, 250_000, 500_000, 750_000]
+# N_UNIQUE_LIST: Sequence[int] = [25_000, 100_000, 250_000]
+N_UNIQUE_LIST: Sequence[int] = [150, 300, 600, 1200, 2400]
+# N_UNIQUE_LIST: Sequence[int] = [25000, 50000, 75000, 100000]
+
+# N_UNIQUE_LIST: Sequence[int] = [1_000_000]
+
 # zipf parameters to pin
 PIN_VAR = 'zipf_s'
-PIN_VALUES: Sequence[float] = [0.0]
+PIN_VALUES: Sequence[float] = [1.0]
 DEFAULT_S_VALUES: Sequence[float] = [0.0]
 
 # ---------------------------------------------------------------------------
@@ -73,17 +84,23 @@ CUSTOM_QUERIES: List[Query] = [
         "index": 0,
         "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2"},
     },
-    {
-        "name": "constant_double_column_groupby",
-        "index": 1,
-        "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
-    },
     # {
-    #     "name": "single_column_groupby",
+    #     "name": "constant_double_column_groupby",
+    #     "index": 1,
+    #     "run_script": {"duckdb": "SELECT 1, str1 FROM varchars GROUP BY 1, str1"},
+    # },
+    # {
+    #     "name": "double_column_groupby",
     #     "index": 2,
-    #     "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
+    #     "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2 limit 1"},
+    # },
+    # {
+    #     "name": "double_column_groupby",
+    #     "index": 3,
+    #     "run_script": {"duckdb": "SELECT str1, str2, str3 FROM varchars GROUP BY str1, str2, str3"},
     # },
 ]
+
 
 # =============================================================================
 # ░░ Dataset assembly ░░
@@ -97,10 +114,9 @@ def len_spec_to_key(spec: LengthSpec) -> str:
 
 
 def build_db_path(len_spec: LengthSpec, n_unique: int, s_val: float) -> str:
-    dist_dir = f"varchars_grp_size_uniform"
-    len_dir = f"len_{len_spec_to_key(len_spec)}"
+    dist_dir = f"varchars_grp_size_uniform_nrows={TOTAL_ROWS_LIST[0] / 1_000_000}M_uniques={n_unique}_len={len_spec_to_key(len_spec)}"
     fname = f"varchars-grp-size-{n_unique}.db"
-    rel = os.path.join(dist_dir, len_dir, fname)
+    rel = os.path.join(dist_dir, fname)
     return get_data_path(rel)
 
 
@@ -108,15 +124,16 @@ def make_column_specs(spec: LengthSpec, n_unique: int, s_val: float) -> List[Col
     return [
         ColumnSpec("str1", n_unique, spec, "uniform", zipf_s=s_val, use_dictionary=True),
         ColumnSpec("str2", n_unique, spec, "uniform", zipf_s=s_val, use_dictionary=True),
-        ColumnSpec("str3", n_unique, spec, "uniform", zipf_s=s_val, use_dictionary=False),
+        ColumnSpec("str3", n_unique, spec, "uniform", zipf_s=s_val, use_dictionary=True),
+
     ]
 
 
 def assemble_datasets(
-    length_specs: Sequence[LengthSpec] = LENGTH_SPECS,
-    total_rows_list: Sequence[int] = TOTAL_ROWS_LIST,
-    n_unique_list: Sequence[int] = N_UNIQUE_LIST,
-    s_values: Sequence[float] = DEFAULT_S_VALUES,
+        length_specs: Sequence[LengthSpec] = LENGTH_SPECS,
+        total_rows_list: Sequence[int] = TOTAL_ROWS_LIST,
+        n_unique_list: Sequence[int] = N_UNIQUE_LIST,
+        s_values: Sequence[float] = DEFAULT_S_VALUES,
 ) -> List[DataSet]:
     datasets: List[DataSet] = []
     combo_iter = itertools.product(length_specs, total_rows_list, n_unique_list, s_values)
@@ -146,10 +163,11 @@ def assemble_datasets(
             {
                 "name": f"len{name_key}_uni{uniques}_zipf{s_val}",
                 "setup_script": setup_script,
-                "config": {"string_length": len_spec, "n_unique": uniques, "zipf_s": s_val},
+                "config": {"string_length": len_spec, "Domain Cardinality": uniques},
             }
         )
     return datasets
+
 
 # =============================================================================
 # ░░ Benchmark builder ░░
@@ -162,12 +180,15 @@ def build_benchmark(s_values_list: Sequence[float] = DEFAULT_S_VALUES) -> Benchm
         "queries": CUSTOM_QUERIES,
     }
 
+
 # =============================================================================
 # ░░ Main entry-point ░░
 # =============================================================================
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
 SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary]
+# SYSTEMS = [DUCK_DB_MAIN, unified_string_dictionary_256MB_no_constraint]
+
 CONFIG_BASE_NAME = "USSR_vs_MAIN"
 
 

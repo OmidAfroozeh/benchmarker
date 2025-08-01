@@ -48,7 +48,7 @@ from src.utils import get_data_path  # type: ignore
 LengthSpec = Union[int, Tuple[int, int]]  # fixed or (min, max)
 
 # default grids
-LENGTH_SPECS: Sequence[LengthSpec] = [16, 32, 64, 128, 255]
+LENGTH_SPECS: Sequence[LengthSpec] = [16, 32, 64, 128, 256]
 TOTAL_ROWS_LIST: Sequence[int] = [10_000_000]
 N_UNIQUE_LIST: Sequence[int] = [100]
 S_VALUES: Sequence[float] = [0.0]
@@ -59,7 +59,7 @@ S_VALUES: Sequence[float] = [0.0]
 # Which variable to pin (only n_unique supported in this example)
 PIN_VAR = 'n_unique'
 # Values for the pinned variable; e.g., run benchmarks for these unique counts
-PIN_VALUES: Sequence[int] = [100]
+PIN_VALUES: Sequence[int] = [200]
 
 # ---------------------------------------------------------------------------
 # Fixed generation knobs
@@ -72,20 +72,20 @@ SEED_BASE: int = 999
 # Custom query list
 # ----------------------------------------------------------------------------
 CUSTOM_QUERIES: List[Query] = [
-    {
-        "name": "double_column_groupby",
-        "index": 0,
-        "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2"},
-    },
+    # {
+    #     "name": "double_column_groupby",
+    #     "index": 0,
+    #     "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2"},
+    # },
     {
         "name": "constant_double_column_groupby",
         "index": 1,
-        "run_script": {"duckdb": "SELECT str1, str2 FROM varchars GROUP BY str1, str2 limit 10"},
+        "run_script": {"duckdb": "SELECT 1, str2 FROM varchars GROUP BY 1, str2"},
     },
     # {
     #     "name": "single_column_groupby",
     #     "index": 2,
-    #     "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1 limit 10"},
+    #     "run_script": {"duckdb": "SELECT str1 FROM varchars GROUP BY str1"},
     # },
     # {
     #     "name": "triple_column_groupby",

@@ -11,15 +11,15 @@ sys.path.insert(0, str(grandparent))
 great_grandparent = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(great_grandparent))
 
-from config.benchmark.clickbench import get_clickbench
-from config.systems.duckdb import unified_string_dictionary_256MB_no_constraint, Unified_String_Dictionary, UnifiedStringDictionary_1GB_full_insertion, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,ussr_2x_size_analyze_all_vecs, ussr_16MB, ussr_2x_size, DUCKDB_emit_DICT, DUCK_DB_USSR_stable_version_operator_bttr_strs_local, DUCK_DB_USSR, DUCK_DB_MAIN, DUCK_DB_USSR_new_lock, DUCK_DB_USSR_no_singleton
+from config.benchmark.imdb import get_imdb_benchmark
+from config.systems.duckdb import Unified_String_Dictionary, UnifiedStringDictionary_1GB_full_insertion, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,ussr_2x_size_analyze_all_vecs, ussr_16MB, ussr_2x_size, DUCKDB_emit_DICT, DUCK_DB_USSR_stable_version_operator_bttr_strs_local, DUCK_DB_USSR, DUCK_DB_MAIN, DUCK_DB_USSR_new_lock, DUCK_DB_USSR_no_singleton
 from src.models import RunConfig
 from src.runner.experiment_runner import run
 
 
 def main():
     config: RunConfig = {
-        'name': 'USSR_vs_baseline_clickbench',
+        'name': 'USSR_vs_baseline_imdb',
         'run_settings': {
             'n_parallel': 1,
             'n_runs': 6,
@@ -30,11 +30,10 @@ def main():
             # {'n_threads': 4},
             # {'n_threads': 8},
         ],
-        'systems': [DUCK_DB_MAIN, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion],
-        'benchmarks': get_clickbench(),
+        'systems': [DUCK_DB_MAIN, Unified_String_Dictionary],
+        'benchmarks': get_imdb_benchmark(),
     }
     run(config)
-# SYSTEMS = [DUCK_DB_MAIN, UnifiedStringDictionary_initial_benchmark_32MB_upper_limit_smarter_insertion,unified_string_dictionary_256MB_no_constraint, Unified_String_Dictionary]
 
 
 if __name__ == "__main__":

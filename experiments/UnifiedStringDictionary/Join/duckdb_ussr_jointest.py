@@ -313,7 +313,8 @@ sys.path.insert(0, str(great_grandparent))
 from config.systems.duckdb import (
     DUCK_DB_MAIN,
     USSR_SALT_CLEAN,
-    Unified_String_Dictionary
+    Unified_String_Dictionary,
+    unified_string_dictionary_sort_test
 )  # type: ignore
 from src.runner.experiment_runner import run  # type: ignore
 
@@ -340,18 +341,39 @@ TABLE_A, TABLE_B = "varchars_a", "varchars_b"
 
 # Queries --------------------------------------------------------------------
 CUSTOM_QUERIES: List[Query] = [
+    # {
+    #     "name": "join_on_integer_keys",
+    #     "index": 0,
+    #     "run_script": {
+    #         "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id;"
+    #     },
+    # },
+    # {
+    #     "name": "join_on_integer_keys_limited_result",
+    #     "index": 1,
+    #     "run_script": {
+    #         "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id limit 10;"
+    #     },
+    # },
+    # {
+    #     "name": "sort_on_integer_keys_result",
+    #     "index": 2,
+    #     "run_script": {
+    #         "duckdb": f"select * from varchars_a order by id;"
+    #     },
+    # },
+    # {
+    #     "name": "sort_on_integer_keys_limited_result",
+    #     "index": 3,
+    #     "run_script": {
+    #         "duckdb": f"select * from varchars_a order by id limit 10;"
+    #     },
+    # },
     {
-        "name": "join_on_integer_keys",
+        "name": "aggregate_after_join",
         "index": 0,
         "run_script": {
-            "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id;"
-        },
-    },
-    {
-        "name": "join_on_integer_keys_limited_result",
-        "index": 1,
-        "run_script": {
-            "duckdb": f"select * from varchars_a join varchars_b on varchars_a.id = varchars_b.id limit 10;"
+            "duckdb": f"select varchars_a.str1 from varchars_a join varchars_b on varchars_a.id = varchars_b.id group by varchars_a.str1;"
         },
     },
 ]
@@ -373,8 +395,8 @@ def build_db_path(len_spec: LengthSpec, n_unique: int, s_val: float, root: Optio
 def make_column_specs(spec: LengthSpec, n_unique: int, s_val: float) -> List[ColumnSpec]:
     return [
         ColumnSpec("str1", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        # ColumnSpec("str2", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
-        # ColumnSpec("str3", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
+        ColumnSpec("str2", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
+        ColumnSpec("str3", n_unique, spec, "zipf", zipf_s=s_val, use_dictionary=True),
     ]
 
 
@@ -437,7 +459,7 @@ def build_benchmark(root: Optional[Path] = None) -> Benchmark:
 # Runtime settings -----------------------------------------------------------
 RUN_SETTINGS = {"n_parallel": 1, "n_runs": 6}
 SYSTEM_SETTINGS = [{"n_threads": 8}]
-SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary]
+SYSTEMS = [DUCK_DB_MAIN, Unified_String_Dictionary, unified_string_dictionary_sort_test]
 
 
 # Main entry point -----------------------------------------------------------
